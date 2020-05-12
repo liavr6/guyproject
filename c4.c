@@ -29,7 +29,51 @@ const char * adding_product_category = "Please enter product category:";
 const char * adding_product_number = "Please enter number of products to add:";
 const char * adding_product_price = "Please enter the price of the product:";
 const char * adding_product_date = "Please enter expiration date of the product[dd/mm/yy]:";
+typedef struct date { int year; int month; int day; } date;
+typedef struct product { char * product_name; char * product_category; char * barcode; int available; double price; date * expire_date; } product;
+typedef struct super_market { product ** product_list; int number_of_products; } super_market;
+int main()
+{
+	super_market *themarket = { 0 };
 
+	//scanf("%d%d", &rows, &cols);
+
+	if (NULL == (themarket = malloc(sizeof(super_market*)))
+		exit(1);
+		for (i = 0; i < rows; i++) {
+			super_market = malloc(sizeof(super_market*));
+				/* incomplete, must check if failed */
+		}
+
+	return 0;
+}
+int addproduct()
+{
+	return 0;
+}
+int remproduct()
+{
+	return 0;
+}
+int checkexpertionproduct()
+{
+	return 0;
+}
+int printallproduct()
+{
+	return 0;
+}
+int updateproduct()
+{
+	return 0;
+}
+int exitsystem(char *exitProgrammessage)
+{
+	free(*themarket);
+	print(exitProgrammessage)
+	exit(0);
+	return 0;
+}
 //operation 2 constant strings
 const char * store_empty = "\nThe store is empty!";
 const char * delete_barcode = "\nPlease enter product barcode you want to delete:";
