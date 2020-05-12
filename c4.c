@@ -44,7 +44,7 @@ int main()
 			super_market = malloc(sizeof(super_market*));
 				/* incomplete, must check if failed */
 		}
-
+	print(*main_interface);
 	return 0;
 }
 int addproduct()
