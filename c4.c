@@ -2,6 +2,7 @@
 #define MAX_PRODUCT_NAME_LENGTH 20
 #define MAX_CATEGORY_LENGTH 10
 #define BARCODE_LENGTH 12
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <string.h>
@@ -32,48 +33,6 @@ const char * adding_product_date = "Please enter expiration date of the product[
 typedef struct date { int year; int month; int day; } date;
 typedef struct product { char * product_name; char * product_category; char * barcode; int available; double price; date * expire_date; } product;
 typedef struct super_market { product ** product_list; int number_of_products; } super_market;
-int main()
-{
-	super_market *themarket = { 0 };
-
-	//scanf("%d%d", &rows, &cols);
-
-	if (NULL == (themarket = malloc(sizeof(super_market*)))
-		exit(1);
-		for (i = 0; i < rows; i++) {
-			super_market = malloc(sizeof(super_market*));
-				/* incomplete, must check if failed */
-		}
-	print(*main_interface);
-	return 0;
-}
-int addproduct()
-{
-	return 0;
-}
-int remproduct()
-{
-	return 0;
-}
-int checkexpertionproduct()
-{
-	return 0;
-}
-int printallproduct()
-{
-	return 0;
-}
-int updateproduct()
-{
-	return 0;
-}
-int exitsystem(char *exitProgrammessage)
-{
-	free(*themarket);
-	print(exitProgrammessage)
-	exit(0);
-	return 0;
-}
 //operation 2 constant strings
 const char * store_empty = "\nThe store is empty!";
 const char * delete_barcode = "\nPlease enter product barcode you want to delete:";
@@ -117,4 +76,119 @@ const char * update_product_price = "\nPlease enter new product price:";
 const char * update_product_date = "\nPlease enter new product expiration date[dd/mm/yy]:";
 
 //operation 6 constant strings
-exitProgram = "\nexit...";
+const char * exitProgram = "\nexit...";
+
+int main();
+int addproduct();
+int remproduct();
+int checkexpertionproduct();
+int printallproduct();
+int updateproduct();
+void exitsystem();
+void read_barcode(char barcode_str[BARCODE_LENGTH + 1], int max);
+
+
+int main()
+{
+	int choice = 0;
+	super_market *themarket;
+
+	if (NULL == (themarket = calloc(MAX_NUM_PRODUCTS, sizeof(product))))
+		exit(1);
+	while (1)
+	{
+		printf("\n");
+		printf("%s", main_interface);
+		scanf("%d", &choice);
+		switch (choice)
+		{
+		case 1:
+			addproduct();
+			break;
+		case 2:
+			remproduct();
+			break;
+		case 3:
+			checkexpertionproduct();
+			break;
+		case 4:
+			printallproduct();
+			break;
+		case 5:
+			updateproduct();
+			break;
+		case 6:
+			exitsystem();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+
+int addproduct()
+{
+	char barcode[BARCODE_LENGTH + 1] = { 0 };
+	printf("%s", adding_product_barcode);
+	read_barcode(barcode, BARCODE_LENGTH + 1);
+	printf("%s", barcode);
+
+	return 0;
+
+}
+int remproduct()
+{
+	char barcode[BARCODE_LENGTH + 1] = { 0 };
+	printf("%s", delete_barcode);
+	read_barcode(barcode, BARCODE_LENGTH + 1);
+	printf("%s", barcode);
+
+	return 0;
+}
+int checkexpertionproduct()
+{
+	printf("%s", expired_date_check);
+
+	return 0;
+}
+int printallproduct()
+{
+	printf("%s", print_products);
+
+	return 0;
+}
+int updateproduct()
+{
+	char barcode[BARCODE_LENGTH + 1] = { 0 };
+	printf("%s", update_barcode);
+	read_barcode(barcode, BARCODE_LENGTH + 1);
+	printf("%s", barcode);
+	return 0;
+}
+void exitsystem()
+{
+	//free(*marketforfree);
+	printf("%s", exitProgram);
+	exit(0);
+}
+
+
+//the function gets input from the user up until max size of the char array
+
+	void  read_barcode(char barcode_str[], int max)
+	{
+		// read input from the user
+		scanf("%s", barcode_str);
+		int k;
+		// remove '\n' and empty the input buffer
+		for (k = 0; k < max; k++)
+		{
+			if (barcode_str[k] == '\n')
+			{
+				barcode_str[k] = '\0';	// remove '\n'
+				break;
+			}
+		}
+		return 0;
+	}
