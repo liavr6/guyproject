@@ -85,7 +85,7 @@ int checkexpertionproduct();
 int printallproduct();
 int updateproduct();
 void exitsystem();
-void read_barcode(char barcode_str[BARCODE_LENGTH + 1], int max);
+char *read_barcode(int max);
 
 
 int main()
@@ -129,19 +129,42 @@ int main()
 
 int addproduct()
 {
-	char barcode[BARCODE_LENGTH + 1] = { 0 };
+	char *barcode = NULL;
+	char *product_name = NULL;
+	char *product_category = NULL;
+	int available = 0;
+	double price = 0;
+	date *expire_date = NULL;
+	product *prod = NULL;
+	if (NULL == (prod = malloc(sizeof(product))))
+		return 1;
 	printf("%s", adding_product_barcode);
-	read_barcode(barcode, BARCODE_LENGTH + 1);
-	printf("%s", barcode);
+	barcode = read_barcode(BARCODE_LENGTH);
+	printf("%s", adding_product_name);
+	product_name = read_barcode(BARCODE_LENGTH);
+	printf("%s", adding_product_category);
+	product_category = read_barcode(BARCODE_LENGTH);
+	printf("%s", adding_product_number);
+	scanf("%d", &available);
+	printf("%s", adding_product_price);
+	scanf ("%lf",&price);
+	printf("%s", adding_product_date);
+	expire_date = read_barcode(BARCODE_LENGTH);
+	prod->barcode = barcode;
+	prod->product_name = product_name;
+	prod->product_category = product_category;
+	prod->available = available;
+	prod->price = price;
+	prod->expire_date = expire_date;
 
 	return 0;
 
 }
 int remproduct()
 {
-	char barcode[BARCODE_LENGTH + 1] = { 0 };
+	char *barcode = NULL;
 	printf("%s", delete_barcode);
-	read_barcode(barcode, BARCODE_LENGTH + 1);
+	barcode = read_barcode(BARCODE_LENGTH + 1);
 	printf("%s", barcode);
 
 	return 0;
@@ -160,9 +183,9 @@ int printallproduct()
 }
 int updateproduct()
 {
-	char barcode[BARCODE_LENGTH + 1] = { 0 };
-	printf("%s", update_barcode);
-	read_barcode(barcode, BARCODE_LENGTH + 1);
+	char *barcode = NULL;
+	printf("%s", update_product_name);
+	barcode = read_barcode(BARCODE_LENGTH + 1);
 	printf("%s", barcode);
 	return 0;
 }
@@ -176,19 +199,12 @@ void exitsystem()
 
 //the function gets input from the user up until max size of the char array
 
-	void  read_barcode(char barcode_str[], int max)
+	char *read_barcode(int max)
 	{
+		char *temp = NULL;
+		if (NULL == (temp = malloc(max * sizeof(char)+1)))
+			return 1;
 		// read input from the user
-		scanf("%s", barcode_str);
-		int k;
-		// remove '\n' and empty the input buffer
-		for (k = 0; k < max; k++)
-		{
-			if (barcode_str[k] == '\n')
-			{
-				barcode_str[k] = '\0';	// remove '\n'
-				break;
-			}
-		}
-		return 0;
+		 scanf("\n%[^\n]s", temp); 
+		return temp;
 	}
