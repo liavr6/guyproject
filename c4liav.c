@@ -161,10 +161,11 @@ int addproduct(super_market *themarket)
 	barcode = read_barcode(BARCODE_LENGTH);
 	char *bar =NULL;
 	int i = 0;
-	for (i = 0; i < themarket->number_of_products; i++)
+	int numpro=themarket->number_of_products;
+	for (i = 0; i < numpro; i++)
 	{
 		bar = themarket->product_list[i]->barcode;
-		if (*bar == *barcode)
+		if (strcmp(bar,barcode)==0)
 		{
 			exist = 1;
 			break;
@@ -174,14 +175,10 @@ int addproduct(super_market *themarket)
 	{
 		printf("%s", barcode_already_exist);
 		scanf("%d", &available);
-		prod->barcode = themarket->product_list[i]->barcode;
-		prod->product_name = themarket->product_list[i]->product_name;
-		prod->product_category = themarket->product_list[i]->product_category;
-		prod->available = available;
-		prod->price = themarket->product_list[i]->price;
-		prod->expire_date = themarket->product_list[i]->expire_date;
-		
+		themarket->product_list[i]->available += available;
 		printf("Additional %d products of %s added", available, themarket->product_list[i]->product_name);
+		exist = 0;
+
 	}
 	else
 	{
@@ -210,9 +207,10 @@ int addproduct(super_market *themarket)
 		prod->price = price;
 		prod->expire_date = expire_date;
 		printf("The product %s - barcode:%s, added successfully", product_name, barcode);
+		themarket->product_list[themarket->number_of_products] = prod;
+		themarket->number_of_products += 1;
 	}
-	themarket->product_list[themarket->number_of_products] = prod;
-	themarket->number_of_products += 1;
+
 	exist = 0;
 	return 0;
 
@@ -249,7 +247,6 @@ int printallproduct(super_market *themarket)
 
 				char datestring[9] = { 0 };
 				sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
-				//datestring = *day + '/' + *month + '/' + *year;
 
 				printf("%s\n", print_products);
 				printf(print_product_name);
@@ -292,10 +289,13 @@ void exitsystem(super_market *marketforfree)
 
 	char *read_barcode(int max)
 	{
+		char format[]="10000000000000000";
 		char *temp = NULL;
 		if (NULL == (temp = malloc(max * sizeof(char)+1)))
 			return 1;
 		// read input from the user
-		 scanf("\n%[^\n]s", temp); 
+
+		sprintf(format, "\n%%%d[^\n]s", max);
+		 scanf(format, temp); 
 		return temp;
 	}
