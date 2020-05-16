@@ -49,15 +49,16 @@ const char * expired_product_date = "\nProduct expiration date: ";
 
 
 //operation 4 constant strings
-const char * print_no_products = "\nNo products in the store!\n";
-const char * print_products = "\n----------";
-const char * print_product_name = "\nProduct name: ";
-const char * print_product_barcode = "\nProduct barcode: ";
-const char * print_product_category = "\nProduct category: ";
-const char * print_product_number = "\nProduct available quantity: ";
-const char * print_product_price = "\nProduct price: ";
-const char * print_product_expireDate = "\nProduct expiration date: ";
-const char * print_total_number = "\nTotal number of products: ";
+const char * print_products_head = "~~~~~~~~~~~~~~~All Products~~~~~~~~~~~~~~~\n";
+const char * print_no_products = "No products in the store!\n";
+const char * print_products = "----------";
+const char * print_product_name = "Product name: ";
+const char * print_product_barcode = "Product barcode: ";
+const char * print_product_category = "Product category: ";
+const char * print_product_number = "Product available quantity: ";
+const char * print_product_price = "Product price: ";
+const char * print_product_expireDate = "Product expiration date: ";
+const char * print_total_number = "Total number of products: ";
 
 //operation 5 constant strings
 const char * update_barcode = "\nPlease enter product barcode you want to update:";
@@ -82,7 +83,7 @@ int main();
 int addproduct(super_market *themarket);
 int remproduct();
 int checkexpertionproduct();
-int printallproduct();
+int printallproduct(super_market *themarket);
 int updateproduct();
 void exitsystem(super_market *themarket);
 char *read_barcode(int max);
@@ -118,7 +119,7 @@ int main()
 			checkexpertionproduct();
 			break;
 		case 4:
-			printallproduct();
+			printallproduct(themarket);
 			break;
 		case 5:
 			updateproduct();
@@ -231,9 +232,43 @@ int checkexpertionproduct()
 
 	return 0;
 }
-int printallproduct()
-{
-	printf("%s", print_products);
+int printallproduct(super_market *themarket)
+	{
+	int index = themarket->number_of_products;
+		if (index == 0)
+		{
+			printf("%s", print_no_products);
+			return 0;
+		}
+		else
+		{
+			printf("%s", print_products_head);
+			for (int i = 0; i < index; i++)
+			{
+
+
+				char datestring[9] = { 0 };
+				sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
+				//datestring = *day + '/' + *month + '/' + *year;
+
+				printf("%s\n", print_products);
+				printf(print_product_name);
+				printf("%s\n", themarket->product_list[i]->product_name);
+				printf(print_product_barcode);
+				printf("%s\n", themarket->product_list[i]->barcode);
+				printf(print_product_category);
+				printf("%s\n", themarket->product_list[i]->product_category);
+				printf(print_product_number);
+				printf("%d\n", themarket->product_list[i]->available);
+				printf(print_product_price);
+				printf("%lf\n", themarket->product_list[i]->price);
+				printf(print_product_expireDate);
+				printf("%s\n", datestring);
+			}
+			printf(print_total_number);
+			printf("%d\n", themarket->number_of_products);
+
+		}
 
 	return 0;
 }
