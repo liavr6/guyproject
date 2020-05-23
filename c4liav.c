@@ -141,27 +141,17 @@ int addproduct(super_market *themarket)
 		printf("%s", too_much_products);
 		return 0;
 	}
-	char *barcode = NULL;
-	char *product_name = NULL;
-	char *product_category = NULL;
-	int available = 0;
+	char *barcode = NULL, *product_name = NULL, *product_category = NULL, *datestirng = NULL, *bar = NULL, day[3] = { 0 }, month[3] = { 0 }, year[3] = { 0 };
+	int available = 0, exist = 0, i = 0, numpro = themarket->number_of_products;;
 	double price = 0;
-	char *datestirng = NULL;
 	date *expire_date = NULL;
-	char day[3] = { 0 };
-	char month[3] = { 0 };
-	char year[3] = { 0 };
 	product *prod = NULL;
-	int exist = 0;
 	if (NULL == (prod = malloc(sizeof(product))))
 		return 1;
 	if (NULL == (expire_date = malloc(sizeof(date))))
 		return 1;
 	printf("%s", adding_product_barcode);
 	barcode = read_barcode(BARCODE_LENGTH);
-	char *bar =NULL;
-	int i = 0;
-	int numpro=themarket->number_of_products;
 	for (i = 0; i < numpro; i++)
 	{
 		bar = themarket->product_list[i]->barcode;
@@ -178,7 +168,6 @@ int addproduct(super_market *themarket)
 		themarket->product_list[i]->available += available;
 		printf("Additional %d products of %s added", available, themarket->product_list[i]->product_name);
 		exist = 0;
-
 	}
 	else
 	{
@@ -210,10 +199,8 @@ int addproduct(super_market *themarket)
 		themarket->product_list[themarket->number_of_products] = prod;
 		themarket->number_of_products += 1;
 	}
-
 	exist = 0;
 	return 0;
-
 }
 int remproduct()
 {
