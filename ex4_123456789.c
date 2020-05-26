@@ -206,6 +206,7 @@ int remproduct(super_market *themarket)
 {
 	char *barcode = NULL;
 	int i, bar, numpro = themarket->number_of_products;
+	product *temp = NULL;
 	// Check if the store is empty
 	if (numpro == 0)
 	{
@@ -224,7 +225,14 @@ int remproduct(super_market *themarket)
 			// If the barcode is the same delete the product
 			if (strcmp(bar, barcode) == 0)
 			{
-				free(themarket->product_list[i]);
+				temp = themarket->product_list[i];
+				free(temp);
+				while(themarket->product_list[i + 1] != NULL)
+				{
+					themarket->product_list[i] = themarket->product_list[i + 1];
+					i++;
+				}
+				themarket->product_list[i] = NULL;
 				themarket->number_of_products--;
 				printf("%s", delete_barcode_succeed);
 				return 0;
