@@ -41,8 +41,8 @@ const char * delete_barcode_succeed = "\nThe product deleted successfully!";
 
 
 //operation 3 constant strings
-const char * expired_date_check = "\nWhat date you want to check[dd/mm/yy]:";
-const char * expired_products = "\n~~~~~~~~~~~~~~~Expired Products~~~~~~~~~~~~~~~\n";
+const char * expired_date_check = "What date you want to check[dd/mm/yy]:";
+const char * expired_products = "~~~~~~~~~~~~~~~Expired Products~~~~~~~~~~~~~~~\n";
 const char * expired_product_name = "Product name: ";
 const char * expired_product_barcode = "\nProduct barcode: ";
 const char * expired_product_date = "\nProduct expiration date: ";
@@ -79,7 +79,7 @@ const char * update_product_date = "\nPlease enter new product expiration date[d
 //operation 6 constant strings
 const char * exitProgram = "\nexit...";
 
-int main();
+void main();
 int addproduct(super_market *themarket);
 int remproduct(super_market *themarket);
 int checkexpirationproduct(super_market *themarket);
@@ -89,7 +89,13 @@ void exitsystem(super_market *themarket);
 char *read_barcode(int max);
 
 
-int main()
+
+/*Inputs:(while intilizing the function doesn't recive input, but while running it recives an int which manages the next operations until termination)
+Return parameter:None
+Function functionality: manages the interface of the program by reciving an int and activating the chosen sequnce of functions by a switch in a while loop,
+only exists when the right function is activated*/
+
+void main()
 {
 	int choice = 0;
 	super_market *themarket = NULL;
@@ -133,7 +139,10 @@ int main()
 	}
 }
 
-
+/*Inputs:(recives a supermarket pointer) Return parameter:int which specfice success or failure
+Function functionality: the function adds a product to the supermarket list and updates the quantity of an exisiting one if asked,
+it recives the new product data from the user,
+it can add products untill a defined limit*/
 int addproduct(super_market *themarket)
 {
 	if (themarket->number_of_products == MAX_NUM_PRODUCTS)
@@ -302,7 +311,8 @@ int checkexpirationproduct(super_market *themarket)
 		}
 	}
 	return 0;
-}
+}/*Inputs:(recives a supermarket pointer) Return parameter:int which specfice success or failure
+Function functionality: the function prints all the prodacts and values by order, if the supermarket is empty it declares it with a special message*/
 int printallproduct(super_market *themarket)
 {
 	int index = themarket->number_of_products;
@@ -404,6 +414,8 @@ int updateproduct(super_market *themarket)
 	}
 	return 0;
 }
+/*Inputs:(recives a supermarket pointer) Return parameter:None, but exists while returning exit code 0
+Function functionality: the function frees the specified allocated memory by the pointer, prints a success message and terminates the program*/
 void exitsystem(super_market *marketforfree)
 {
 	free(marketforfree);
@@ -411,8 +423,8 @@ void exitsystem(super_market *marketforfree)
 	exit(0);
 }
 
-
-//the function gets input from the user up until max size of the char array
+/*Inputs:(int which represents the maximal possible size of the return char array) Return parameter:pointer to a char array
+Function functionality: the function gets input from the user up until max size of the char array, filters it, and returns a pointer to the string*/
 
 char *read_barcode(int max)
 {
