@@ -18,7 +18,7 @@ const char * main_interface = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"\
 "	4. Print all the products\n"\
 "	5. Update product\n"\
 "	6. EXIT SYSTEM\n"\
-"Please choose operation[1 - 6]:";
+"Please choose operation [1-6]:";
 
 //operation 1 constant strings
 
@@ -81,10 +81,10 @@ const char * exitProgram = "\nexit...";
 
 int main();
 int addproduct(super_market *themarket);
-int remproduct();
-int checkexpertionproduct();
+int remproduct(super_market *themarket);
+int checkexpirationproduct(super_market *themarket);
 int printallproduct(super_market *themarket);
-int updateproduct();
+int updateproduct(super_market *themarket);
 void exitsystem(super_market *themarket);
 char *read_barcode(int max);
 
@@ -97,7 +97,7 @@ int main()
 
 	if (NULL == (themarket = malloc(sizeof(super_market))))
 		exit(1);
-	if (NULL == (pro_list = malloc(MAX_NUM_PRODUCTS *sizeof(product))))
+	if (NULL == (pro_list = malloc(MAX_NUM_PRODUCTS * sizeof(product))))
 		exit(1);
 	themarket->product_list = pro_list;
 	themarket->number_of_products = 0;
@@ -113,16 +113,16 @@ int main()
 			addproduct(themarket);
 			break;
 		case 2:
-			remproduct();
+			remproduct(themarket);
 			break;
 		case 3:
-			checkexpertionproduct();
+			checkexpirationproduct(themarket);
 			break;
 		case 4:
 			printallproduct(themarket);
 			break;
 		case 5:
-			updateproduct();
+			updateproduct(themarket);
 			break;
 		case 6:
 			exitsystem(themarket);
@@ -142,7 +142,7 @@ int addproduct(super_market *themarket)
 		return 0;
 	}
 	char *barcode = NULL, *product_name = NULL, *product_category = NULL, *datestirng = NULL, *bar = NULL, day[3] = { 0 }, month[3] = { 0 }, year[3] = { 0 };
-	int available = 0, exist = 0, i = 0, numpro = themarket->number_of_products;;
+	int available = 0, exist = 0, i = 0, numpro = themarket->number_of_products;
 	double price = 0;
 	date *expire_date = NULL;
 	product *prod = NULL;
@@ -155,13 +155,13 @@ int addproduct(super_market *themarket)
 	for (i = 0; i < numpro; i++)
 	{
 		bar = themarket->product_list[i]->barcode;
-		if (strcmp(bar,barcode)==0)
+		if (strcmp(bar, barcode) == 0)
 		{
 			exist = 1;
 			break;
 		}
 	}
-	if(exist)
+	if (exist)
 	{
 		printf("%s", barcode_already_exist);
 		scanf("%d", &available);
@@ -202,66 +202,206 @@ int addproduct(super_market *themarket)
 	exist = 0;
 	return 0;
 }
-int remproduct()
+int remproduct(super_market *themarket)
 {
 	char *barcode = NULL;
-	printf("%s", delete_barcode);
-	barcode = read_barcode(BARCODE_LENGTH + 1);
-	printf("%s", barcode);
-
+	int i, bar, numpro = themarket->number_of_products;
+	product *temp = NULL;
+	// Check if the store is empty
+	if (numpro == 0)
+	{
+		printf("%s", store_empty);
+		return 0;
+	}
+	// While a product was not deleted
+	while (1)
+	{
+		printf("%s", delete_barcode);
+		barcode = read_barcode(BARCODE_LENGTH + 1);
+		// Check all of the products
+		for (i = 0; i < numpro; i++)
+		{
+			bar = themarket->product_list[i]->barcode;
+			// If the barcode is the same delete the product
+			if (strcmp(bar, barcode) == 0)
+			{
+				temp = themarket->product_list[i];
+				free(temp);
+				while (themarket->product_list[i + 1] != NULL)
+				{
+					themarket->product_list[i] = themarket->product_list[i + 1];
+					i++;
+				}
+				themarket->product_list[i] = NULL;
+				themarket->number_of_products--;
+				printf("%s", delete_barcode_succeed);
+				return 0;
+			}
+		}
+		printf("%s", delete_barcode_cant_find);
+	}
 	return 0;
 }
-int checkexpertionproduct()
+int checkexpirationproduct(super_market *themarket)
 {
-	printf("%s", expired_date_check);
+	int i, numpro = themarket->number_of_products, day[3] = { 0 }, month[3] = { 0 }, year[3] = { 0 };
+	char datestring[9] = { 0 }, *comp_date = NULL;
+	date *check_date = NULL;
+	if (NULL == (check_date = malloc(sizeof(date))))
+		return 1;
 
+	printf("%s", expired_date_check);
+	comp_date = read_barcode(10);
+	strncpy(day, comp_date, 2);
+	strncpy(month, comp_date + 3, 2);
+	strncpy(year, comp_date + 6, 2);
+
+	check_date->day = atoi(day);
+	check_date->month = atoi(month);
+	check_date->year = atoi(year);
+	for (i = 0; i < numpro; i++)
+	{
+		if (themarket->product_list[i]->expire_date->year < check_date->year)
+		{
+			printf("%s", expired_products);
+			printf("%s%s", expired_product_name, themarket->product_list[i]->product_name);
+			printf("%s%s", expired_product_barcode, themarket->product_list[i]->barcode);
+			sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
+			printf("%s%s", expired_product_date, datestring);
+			continue;
+		}
+		if (themarket->product_list[i]->expire_date->year > check_date->year)
+			continue;
+		if (themarket->product_list[i]->expire_date->year == check_date->year)
+		{
+			if (themarket->product_list[i]->expire_date->month < check_date->month)
+			{
+				printf("%s", expired_products);
+				printf("%s%s", expired_product_name, themarket->product_list[i]->product_name);
+				printf("%s%s", expired_product_barcode, themarket->product_list[i]->barcode);
+				sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
+				printf("%s%s", expired_product_date, datestring);
+				continue;
+			}
+			if (themarket->product_list[i]->expire_date->month > check_date->month)
+				continue;
+			if (themarket->product_list[i]->expire_date->month == check_date->month)
+			{
+				if (themarket->product_list[i]->expire_date->day < check_date->day)
+				{
+					printf("%s", expired_products);
+					printf("%s%s", expired_product_name, themarket->product_list[i]->product_name);
+					printf("%s%s", expired_product_barcode, themarket->product_list[i]->barcode);
+					sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
+					printf("%s%s", expired_product_date, datestring);
+					continue;
+				}
+				else
+					continue;
+			}
+		}
+	}
 	return 0;
 }
 int printallproduct(super_market *themarket)
-	{
+{
 	int index = themarket->number_of_products;
-		if (index == 0)
+	if (index == 0)
+	{
+		printf("%s", print_no_products);
+		return 0;
+	}
+	else
+	{
+		printf("%s", print_products_head);
+		for (int i = 0; i < index; i++)
 		{
-			printf("%s", print_no_products);
-			return 0;
+
+
+			char datestring[9] = { 0 };
+			sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
+
+			printf("%s\n", print_products);
+			printf(print_product_name);
+			printf("%s\n", themarket->product_list[i]->product_name);
+			printf(print_product_barcode);
+			printf("%s\n", themarket->product_list[i]->barcode);
+			printf(print_product_category);
+			printf("%s\n", themarket->product_list[i]->product_category);
+			printf(print_product_number);
+			printf("%d\n", themarket->product_list[i]->available);
+			printf(print_product_price);
+			printf("%g\n", themarket->product_list[i]->price);
+			printf(print_product_expireDate);
+			printf("%s\n", datestring);
 		}
-		else
-		{
-			printf("%s", print_products_head);
-			for (int i = 0; i < index; i++)
-			{
+		printf(print_total_number);
+		printf("%d\n", themarket->number_of_products);
 
-
-				char datestring[9] = { 0 };
-				sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
-
-				printf("%s\n", print_products);
-				printf(print_product_name);
-				printf("%s\n", themarket->product_list[i]->product_name);
-				printf(print_product_barcode);
-				printf("%s\n", themarket->product_list[i]->barcode);
-				printf(print_product_category);
-				printf("%s\n", themarket->product_list[i]->product_category);
-				printf(print_product_number);
-				printf("%d\n", themarket->product_list[i]->available);
-				printf(print_product_price);
-				printf("%lf\n", themarket->product_list[i]->price);
-				printf(print_product_expireDate);
-				printf("%s\n", datestring);
-			}
-			printf(print_total_number);
-			printf("%d\n", themarket->number_of_products);
-
-		}
+	}
 
 	return 0;
 }
-int updateproduct()
+int updateproduct(super_market *themarket)
 {
+	int i, bar, choice, num, numpro = themarket->number_of_products;
 	char *barcode = NULL;
-	printf("%s", update_product_name);
-	barcode = read_barcode(BARCODE_LENGTH + 1);
-	printf("%s", barcode);
+	// Check if the store is empty
+	if (numpro == 0)
+	{
+		printf("%s", print_no_products);
+		return 0;
+	}
+	while (1)
+	{
+		printf("%s", update_barcode);
+		barcode = read_barcode(BARCODE_LENGTH + 1);
+		for (i = 0; i < numpro; i++)
+		{
+			bar = themarket->product_list[i]->barcode;
+			if (strcmp(bar, barcode) == 0)
+			{
+				printf("%s", update_interface_string);
+				scanf("%d", &choice);
+				switch (choice)
+				{
+				case 1:
+					printf("%s", update_product_name);
+					themarket->product_list[i]->product_name = read_barcode(MAX_PRODUCT_NAME_LENGTH);
+					return 0;
+				case 2:
+					printf("%s", update_product_category);
+					themarket->product_list[i]->product_category = read_barcode(MAX_CATEGORY_LENGTH);
+					return 0;
+				case 3:
+					printf("%s", update_product_number);
+					scanf("%d", &num);
+					themarket->product_list[i]->available = num;
+					return 0;
+				case 4:
+					printf("%s", update_product_price);
+					scanf("%d", &num);
+					themarket->product_list[i]->price = num;
+					return 0;
+				case 5:
+					printf("%s", update_product_date);
+					int day[3] = { 0 }, month[3] = { 0 }, year[3] = { 0 };
+					char *new_date = NULL;
+					new_date = read_barcode(10);
+					strncpy(day, new_date, 2);
+					strncpy(month, new_date + 3, 2);
+					strncpy(year, new_date + 6, 2);
+					themarket->product_list[i]->expire_date->day = atoi(day);
+					themarket->product_list[i]->expire_date->month = atoi(month);
+					themarket->product_list[i]->expire_date->year = atoi(year);
+					return 0;
+				default:
+					break;
+				}
+			}
+		}
+		printf("%s", update_barcode_notFound);
+	}
 	return 0;
 }
 void exitsystem(super_market *marketforfree)
@@ -274,15 +414,15 @@ void exitsystem(super_market *marketforfree)
 
 //the function gets input from the user up until max size of the char array
 
-	char *read_barcode(int max)
-	{
-		char format[]="10000000000000000";
-		char *temp = NULL;
-		if (NULL == (temp = malloc(max * sizeof(char)+1)))
-			return 1;
-		// read input from the user
+char *read_barcode(int max)
+{
+	char format[] = "10000000000000000";
+	char *temp = NULL;
+	if (NULL == (temp = malloc(max * sizeof(char) + 1)))
+		return 1;
+	// read input from the user
 
-		sprintf(format, "\n%%%d[^\n]s", max);
-		 scanf(format, temp); 
-		return temp;
-	}
+	sprintf(format, "\n%%%d[^\n]s", max);
+	scanf(format, temp);
+	return temp;
+}
