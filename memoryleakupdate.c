@@ -418,7 +418,6 @@ int updateproduct(super_market *themarket)
 				}
 			}
 		}
-		free(barcode);
 		printf("%s", update_barcode_notFound);
 	}
 	return 0;
