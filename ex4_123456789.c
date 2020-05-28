@@ -204,15 +204,15 @@ int addproduct(super_market *themarket)
 }
 int remproduct(super_market *themarket)
 {
-	char *barcode = NULL;
 	int i, bar, numpro = themarket->number_of_products;
-	product *temp = NULL;
 	// Check if the store is empty
 	if (numpro == 0)
 	{
 		printf("%s", store_empty);
 		return 0;
 	}
+	char *barcode = NULL;
+	product *temp = NULL;
 	// While a product was not deleted
 	while (1)
 	{
@@ -225,6 +225,7 @@ int remproduct(super_market *themarket)
 			// If the barcode is the same delete the product
 			if (strcmp(bar, barcode) == 0)
 			{
+				free(barcode);
 				temp = themarket->product_list[i];
 				free(temp);
 				while(themarket->product_list[i + 1] != NULL)
@@ -300,6 +301,7 @@ int checkexpirationproduct(super_market *themarket)
 					continue;
 			}
 		}
+		free(check_date);
 	}
 	return 0;
 }
@@ -361,6 +363,7 @@ int updateproduct(super_market *themarket)
 			bar = themarket->product_list[i]->barcode;
 			if (strcmp(bar, barcode) == 0)
 			{
+				free(barcode);
 				printf("%s", update_interface_string);
 				scanf("%d", &choice);
 				switch (choice)
