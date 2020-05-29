@@ -111,7 +111,6 @@ void main()
 
 	while (1)
 	{
-		printf("\n");
 		printf("%s", main_interface);
 		scanf("%d", &choice);
 		switch (choice)
@@ -160,7 +159,10 @@ int addproduct(super_market *themarket)
 	if (NULL == (prod = malloc(sizeof(product))))
 		return 1;
 	if (NULL == (expire_date = malloc(sizeof(date))))
+	{
+		free(prod);
 		return 1;
+	}
 	printf("%s", adding_product_barcode);
 	barcode = read_barcode(BARCODE_LENGTH);
 	for (i = 0; i < numpro; i++)
@@ -210,6 +212,7 @@ int addproduct(super_market *themarket)
 		themarket->product_list[themarket->number_of_products] = prod;
 		themarket->number_of_products += 1;
 	}
+	printf("\n");
 	exist = 0;
 	return 0;
 }
@@ -222,7 +225,7 @@ int remproduct(super_market *themarket)
 	// Check if the store is empty
 	if (numpro == 0)
 	{
-		printf("%s", store_empty);
+		printf("%s\n", store_empty);
 		return 0;
 	}
 	char *barcode = NULL;
@@ -260,16 +263,17 @@ int remproduct(super_market *themarket)
 	return 0;
 }
 /*Inputs:(recives a supermarket pointer) Return parameter:int which specfice success or failure, and prints a list of all the expired products
-Function functionality: the function recieves a date from the user and prints all of the products that have an expiration date prior to the 
+Function functionality: the function recieves a date from the user and prints all of the products that have an expiration date prior to the
 date entered*/
 int checkexpirationproduct(super_market *themarket)
 {
 	int i, numpro = themarket->number_of_products, day[3] = { 0 }, month[3] = { 0 }, year[3] = { 0 }, printed = 0;
 	char datestring[9] = { 0 }, *comp_date = NULL;
 	date *check_date = NULL;
-	if (NULL == (check_date = malloc(sizeof(date))))
+	if (NULL == (check_date = malloc(sizeof(date)))) {
+		free(check_date);
 		return 1;
-
+	}
 	printf("%s", expired_date_check);
 	// Recieve the date from the user
 	comp_date = read_barcode(10);
@@ -307,7 +311,8 @@ int checkexpirationproduct(super_market *themarket)
 				{
 					printf("%s", expired_products);
 					printed = 1;
-				}				printf("%s%s", expired_product_name, themarket->product_list[i]->product_name);
+				}				
+				printf("%s%s", expired_product_name, themarket->product_list[i]->product_name);
 				printf("%s%s", expired_product_barcode, themarket->product_list[i]->barcode);
 				sprintf(datestring, "%d/%d/%d", themarket->product_list[i]->expire_date->day, themarket->product_list[i]->expire_date->month, themarket->product_list[i]->expire_date->year);
 				printf("%s%s", expired_product_date, datestring);
@@ -335,7 +340,8 @@ int checkexpirationproduct(super_market *themarket)
 			}
 		}
 	}
-	printf("\n");
+	if(printed == 1)
+		printf("\n");
 	free(check_date);
 	return 0;
 }
@@ -470,6 +476,7 @@ void exitsystem(super_market *marketforfree, product **pro_list)
 	free(pro_list);
 	free(marketforfree);
 	_CrtDumpMemoryLeaks();
+	printf("\n");
 
 	exit(0);
 }
