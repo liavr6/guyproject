@@ -7,7 +7,7 @@
 # define LINE_LENGTH 400
 
 char *readLine(FILE *fPtrRead, char tav);
-int rename_func();
+int rename_func(HW_component* list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
 int returnd_from_cos_func();
 int production_func();
 int fatal_func();
@@ -25,24 +25,16 @@ typedef struct hw_component
 	struct hw_component *next;
 }HW_component;
 
-char *readLine(FILE *fPtrRead, char tav)
+
+int rename_func(HW_component* list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
 {
-	char *temp = NULL;
-	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	int len = 0;
-	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
+	HW_component* nodetochange = NULL;
+	nodetochange = find(list, oldname);
+	if (nodetochange != NULL)
 	{
-		temp[len] += tav;
-		fscanf(fPtrRead, "%c", &tav);
-		len++;
+		strcpy(nodetochange->name, newname);
 	}
-	return temp;
-}
-
-int rename_func()
-{
-
+	sort_alpha(list);
 }
 int returnd_from_cos_func()
 {
@@ -74,24 +66,31 @@ int main(int argc, char* argv[])
 
 	fscanf(fPtrRead, "%c", &tav);
 	char *nextorder = NULL;
-	nextline = readLine(fPtrRead, fPtrWrite, tav);
+	nextline = readLine(fPtrRead, tav);
 	nextorder = split(readLine)[0];
 	while (!feof(fPtrRead))
 	{
-		nextorder = split(readLine)[0];
 
 		if (strcmp(nextorder, "Initialize") == 0)
 		{
+			nextline = readLine(fPtrRead, tav);
+			nextorder = split(readLine)[0];
 			continue;
 			// do something
 		}
 		else if (strcmp(nextorder, "Finalize") == 0)
 		{
+			//print a sorted list to the components file by format $$$
+			//free memory
+			//free_list();
 			break;
 			// do something else
 		}
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
+			char oldname[NAME_LENGTH];//get from file
+			char newname[NAME_LENGTH];
+			rename(oldname,newname);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
@@ -117,9 +116,104 @@ int main(int argc, char* argv[])
 		}
 
 		nextline = readLine(fPtrRead, fPtrWrite, tav);
+		nextorder = split(readLine)[0];
+
 	}
 	fclose(fPtrRead);
 	fclose(fPtrWrite);
+}
+
+char *readLine(FILE *fPtrRead, char tav)
+{
+	char *temp = NULL;
+	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
+		exit(1);
+	int len = 0;
+	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
+	{
+		temp[len] += tav;
+		fscanf(fPtrRead, "%c", &tav);
+		len++;
+	}
+	return temp;
+}
+
+HW_component* sort_alpha(HW_component *head)
+{
+	HW_component *iter = head, *prev = NULL;
+	if (head == NULL)
+		return NULL;
+	for (HW_component *iter = head; iter != NULL; iter = iter->next) {
+		prev = iter; iter = iter->next;
+		while (iter != NULL)
+		{
+
+			prev->next = iter->next;
+			add_and_sort_alpha(head, iter);
+			prev = iter;
+			iter = iter->next;
+		}
+		return head;
+	}
+
+}
+HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
+	HW_component* iter, *prev = NULL;
+	//HW_component* new_node = create_node(data);
+
+	/* incomplete, must check for failure */
+	if (head == NULL)
+		return new_node;
+
+	if (strcmp(new_node->name,head->name)<0) {
+		new_node->next = head;
+		return new_node;
+	}
+
+	iter = head;
+	while (iter != NULL && strcmp(new_node->name, iter->name) >= 0) {
+		prev = iter;
+		iter = iter->next;
+	}
+
+	prev->next = new_node;
+	new_node->next = iter;
+
+	return head;
+}
+
+HW_component *delete(HW_component *head,  char *val)
+{
+	HW_component *iter = head, *prev = NULL;
+
+	if (head == NULL)
+		return head;
+
+	if (head->name == val)
+	{
+		iter = head->next;
+		free(head);
+		return iter;
+	}
+	prev = iter; iter = iter->next;
+	while (iter != NULL)
+	{
+		if (iter->name == val)
+		{
+			prev->next = iter->next;
+			free(iter);
+			break;
+		}
+		prev = iter;
+		iter = iter->next;
+	}
+	return head;
+}
+
+HW_component* find(HW_component *head, char *val) {
+	while (head != NULL && strcmp(head->name,val)!=0)
+		head = head->next;    
+	return head;
 }
 
 /* Free a list of comps */
