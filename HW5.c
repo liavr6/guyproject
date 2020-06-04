@@ -13,8 +13,8 @@ typedef struct hw_component { char name[NAME_LENGTH]; int copies; struct hw_comp
 
 char *readLine(FILE *fPtrRead, char tav);
 int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
-int returnd_from_cos_func();
-int production_func();
+int returnd_from_cos_func(HW_component *list);
+int production_func(HW_component *list);
 int fatal_func();
 int fire_func();
 char *split(char *buf);
@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
 
 			while (nextline !=NULL)
 			{
-				nextname = split(readLine)[0];
-				nextcopies = atoi(split(readLine)[1]);
+				nextname = split(readLine)[1];
+				nextcopies = atoi(split(readLine)[2]);
 				nextline = readLine(compfileread, tav);
 				createinlist(nextcopies, nextcopies, compnodelist);
 			}
@@ -119,13 +119,25 @@ int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME
 	sort_alpha(list);
 	return 0;
 }
-int returnd_from_cos_func()
+int returnd_from_cos_func(HW_component *list,char name[NAME_LENGTH], int copiestoreturn)
 {
-
+	HW_component *nodetochange = NULL;
+	nodetochange = find(list, name);
+	if (nodetochange != NULL)
+	{
+		nodetochange->copies += copiestoreturn;
+	}
+	else
+	{
+		createinlist(name, copiestoreturn, list);
+	}
+	sort_alpha(list);
+	return 0;
 }
-int production_func()
+int production_func(HW_component *list, char name[NAME_LENGTH], int copies)
 {
-
+	returnd_from_cos_func(list, name, copies);
+	return 0;
 }
 int fatal_func()
 {
