@@ -1,13 +1,18 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-# define _CRT_SECURE_NO_WARNINGS
 # define NAME_LENGTH 200
 # define LINE_LENGTH 400
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <crtdbg.h>
+
+// define struct
+typedef struct hw_component { char name[NAME_LENGTH]; int copies; struct hw_component *next; }HW_component;
+
 
 char *readLine(FILE *fPtrRead, char tav);
-int rename_func(HW_component* list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
+int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
 int returnd_from_cos_func();
 int production_func();
 int fatal_func();
@@ -15,43 +20,11 @@ int fire_func();
 char *split(char *buf);
 HW_component *createinlist(char *name, int copynum, int grade, HW_component *newlist);
 HW_component *add_cmp(HW_component *head, HW_component *cmp);
-HW_component* new_cmp(char *name, int copynum, int grade);
+HW_component *new_cmp(char *name, int copynum, int grade);
 void free_list(HW_component *head);
-// define struct
-typedef struct hw_component
-{
-	char name[NAME_LENGTH];
-	int copies;
-	struct hw_component *next;
-}HW_component;
-
-
-int rename_func(HW_component* list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
-{
-	HW_component* nodetochange = NULL;
-	nodetochange = find(list, oldname);
-	if (nodetochange != NULL)
-	{
-		strcpy(nodetochange->name, newname);
-	}
-	sort_alpha(list);
-}
-int returnd_from_cos_func()
-{
-
-}
-int production_func()
-{
-
-}
-int fatal_func()
-{
-
-}
-int fire_func()
-{
-
-}
+HW_component* find(HW_component *head, char *val);
+HW_component* sort_alpha(HW_component *head);
+HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
 
 int main(int argc, char* argv[])
 {
@@ -90,7 +63,7 @@ int main(int argc, char* argv[])
 		{
 			char oldname[NAME_LENGTH];//get from file
 			char newname[NAME_LENGTH];
-			rename(oldname,newname);
+			rename(oldname, newname);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
@@ -121,6 +94,34 @@ int main(int argc, char* argv[])
 	}
 	fclose(fPtrRead);
 	fclose(fPtrWrite);
+}
+
+int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
+{
+	HW_component *nodetochange = NULL;
+	nodetochange = find(list, oldname);
+	if (nodetochange != NULL)
+	{
+		strcpy(nodetochange->name, newname);
+	}
+	sort_alpha(list);
+	return 0;
+}
+int returnd_from_cos_func()
+{
+
+}
+int production_func()
+{
+
+}
+int fatal_func()
+{
+
+}
+int fire_func()
+{
+
 }
 
 char *readLine(FILE *fPtrRead, char tav)
