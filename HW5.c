@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <crtdbg.h>
+#include <crtdbg.h>///////////////////////////////////////////////////
 
 // define struct
 typedef struct hw_component { char name[NAME_LENGTH]; int copies; struct hw_component *next; }HW_component;
@@ -18,46 +18,57 @@ int production_func();
 int fatal_func();
 int fire_func();
 char *split(char *buf);
-HW_component *createinlist(char *name, int copynum, int grade, HW_component *newlist);
+HW_component *createinlist(char *name, int copynum, HW_component *newlist);
 HW_component *add_cmp(HW_component *head, HW_component *cmp);
-HW_component *new_cmp(char *name, int copynum, int grade);
+HW_component *new_cmp(char *name, int copynum);
 void free_list(HW_component *head);
 HW_component* find(HW_component *head, char *val);
 HW_component* sort_alpha(HW_component *head);
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
+void printlisttofile(HW_component *list, FILE *fPtrWrite, int size);
 
 int main(int argc, char* argv[])
 {
-	FILE	*fPtrRead = NULL,
-		*fPtrWrite = NULL;
+	FILE	*orderfileread = NULL,*fPtrWrite = NULL,*compfileread = NULL;
+	HW_component *compnodelist = NULL;
 	char	tav = '0';
 	char *nextline = NULL;
 	char *laststring = "Finalize";
-	fPtrRead = fopen("input.txt", "r");//update file paths
-	fPtrWrite = fopen("output.txt", "w");
-	if (fPtrRead == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
+	orderfileread = fopen("actions.txt", "r");//update file paths
+	compfileread = fopen("components_hw.txt", "r");
+	fPtrWrite = fopen("updated_components.txt", "w");
+	if (orderfileread == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
 
-	fscanf(fPtrRead, "%c", &tav);
+	fscanf(orderfileread, "%c", &tav);
 	char *nextorder = NULL;
-	nextline = readLine(fPtrRead, tav);
+	nextline = readLine(orderfileread, tav);
 	nextorder = split(readLine)[0];
-	while (!feof(fPtrRead))
+	int linecounter = 0;
+	while (!feof(orderfileread))
 	{
-
+		linecounter++;
 		if (strcmp(nextorder, "Initialize") == 0)
 		{
-			nextline = readLine(fPtrRead, tav);
-			nextorder = split(readLine)[0];
+			char *nextname = NULL;
+			int nextcopies = 0;
+			//char *nextorder = NULL;
+			nextline = readLine(compfileread, tav);
+
+			while (nextline !=NULL)
+			{
+				nextname = split(readLine)[0];
+				nextcopies = atoi(split(readLine)[1]);
+				nextline = readLine(compfileread, tav);
+				createinlist(nextcopies, nextcopies, compnodelist);
+			}
 			continue;
 			// do something
 		}
 		else if (strcmp(nextorder, "Finalize") == 0)
 		{
-			//print a sorted list to the components file by format $$$
-			//free memory
-			//free_list();
+			printlisttofile(compnodelist, fPtrWrite, linecounter);
+			free_list(compnodelist);
 			break;
-			// do something else
 		}
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
@@ -88,11 +99,12 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		nextline = readLine(fPtrRead, fPtrWrite, tav);
+		nextline = readLine(orderfileread, fPtrWrite, tav);
 		nextorder = split(readLine)[0];
 
 	}
-	fclose(fPtrRead);
+	fclose(orderfileread);
+	fclose(compfileread);
 	fclose(fPtrWrite);
 }
 
@@ -138,13 +150,29 @@ char *readLine(FILE *fPtrRead, char tav)
 	}
 	return temp;
 }
+void printlisttofile(HW_component *list, FILE *fPtrWrite,int size)
+{
+	char *temp = NULL;
+	char formated[LINE_LENGTH] = "";
+	if (NULL == (temp = malloc(size * LINE_LENGTH * sizeof(char) + 1)))
+		exit(1);
+	for (HW_component *iter = list; iter != NULL; iter = iter->next)
+	{
+		sprintf(formated,"\n%s $$$ %d", iter->name, iter->copies);
+		strcat(temp, formated);
+	}
+	strcat(temp, '\0');
+	fprintf(fPtrWrite, "%s", temp) ;
+	fclose(fPtrWrite);
 
+}
 HW_component* sort_alpha(HW_component *head)
 {
 	HW_component *iter = head, *prev = NULL;
 	if (head == NULL)
 		return NULL;
-	for (HW_component *iter = head; iter != NULL; iter = iter->next) {
+	for (HW_component *iter = head; iter != NULL; iter = iter->next)
+	{
 		prev = iter; iter = iter->next;
 		while (iter != NULL)
 		{
@@ -228,7 +256,7 @@ void free_list(HW_component *head)
 }
 
 /* Allocate a new comps */
-HW_component* new_cmp(char *name, int copynum, int grade)
+HW_component* new_cmp(char *name, int copynum)
 {
 	HW_component *std = NULL;
 
@@ -262,9 +290,9 @@ HW_component *add_cmp(HW_component *head, HW_component *cmp)
 	return head;
 }
 
-HW_component *createinlist(char *name, int copynum, int grade, HW_component *newlist)
+HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 {
-	return add_cmp(newlist,new_cmp(name, copynum, grade));
+	return add_cmp(newlist,new_cmp(name, copynum));
 }
 
 char *split(char *buf)
