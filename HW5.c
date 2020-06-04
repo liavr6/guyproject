@@ -71,17 +71,23 @@ int main(int argc, char* argv[])
 		}
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
-			char oldname[NAME_LENGTH];//get from file
-			char newname[NAME_LENGTH];
+			char oldname[NAME_LENGTH] = split(readLine)[1];
+			char newname[NAME_LENGTH] = split(readLine)[2];/////////check this
 			rename(oldname, newname);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
 		{
+			char name[NAME_LENGTH] = split(readLine)[1];
+			int copiestoreturn= atoi(split(readLine)[2]);
+			returnd_from_cos_func(compnodelist,name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Production") == 0)
 		{
+			char name[NAME_LENGTH] = split(readLine)[1];
+			int copiestoreturn = atoi(split(readLine)[2]);
+			production_func(compnodelist, name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
