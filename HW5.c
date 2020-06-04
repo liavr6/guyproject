@@ -13,8 +13,8 @@ typedef struct hw_component { char name[NAME_LENGTH]; int copies; struct hw_comp
 
 char *readLine(FILE *fPtrRead, char tav);
 int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
-int returnd_from_cos_func(HW_component *list);
-int production_func(HW_component *list);
+int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn);
+int production_func(HW_component *list, char name[NAME_LENGTH], int copies);
 int fatal_func();
 int fire_func();
 char *split(char *buf);
@@ -32,11 +32,11 @@ int main(int argc, char* argv[])
 	FILE	*orderfileread = NULL,*fPtrWrite = NULL,*compfileread = NULL;
 	HW_component *compnodelist = NULL;
 	char	tav = '0';
-	char *nextline = NULL;
-	char *laststring = "Finalize";
-	orderfileread = fopen("actions.txt", "r");//update file paths
-	compfileread = fopen("components_hw.txt", "r");
-	fPtrWrite = fopen("updated_components.txt", "w");
+	char *nextline = NULL,*laststring = "Finalize";
+	char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
+	orderfileread = fopen(orderfile, "r");
+	compfileread = fopen(compfile, "r");
+	fPtrWrite = fopen(fPtr, "w");
 	if (orderfileread == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
 
 	fscanf(orderfileread, "%c", &tav);
@@ -51,7 +51,6 @@ int main(int argc, char* argv[])
 		{
 			char *nextname = NULL;
 			int nextcopies = 0;
-			//char *nextorder = NULL;
 			nextline = readLine(compfileread, tav);
 
 			while (nextline !=NULL)
