@@ -71,21 +71,25 @@ int main(int argc, char* argv[])
 		}
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
-			char oldname[NAME_LENGTH] = split(readLine)[1];
-			char newname[NAME_LENGTH] = split(readLine)[2];/////////check this
+			char oldname[NAME_LENGTH];
+			strcpy(oldname, split(readLine)[1]);
+			char newname[NAME_LENGTH];/////////check this
+			strcpy(newname, split(readLine)[2]);
 			rename(oldname, newname);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
 		{
-			char name[NAME_LENGTH] = split(readLine)[1];
+			char name[NAME_LENGTH];
+			strcpy(name, split(readLine)[1]);
 			int copiestoreturn= atoi(split(readLine)[2]);
 			returnd_from_cos_func(compnodelist,name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Production") == 0)
 		{
-			char name[NAME_LENGTH] = split(readLine)[1];
+			char name[NAME_LENGTH];
+			strcpy(name, split(readLine)[1]);
 			int copiestoreturn = atoi(split(readLine)[2]);
 			production_func(compnodelist, name, copiestoreturn);
 			// do something else
@@ -104,7 +108,8 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		nextline = readLine(orderfileread, fPtrWrite, tav);
+		//nextline = readLine(orderfileread, fPtrWrite, tav);
+		nextline = readLine(orderfileread, tav);
 		nextorder = split(readLine)[0];
 
 	}
