@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	FILE	*orderfileread = NULL,*fPtrWrite = NULL,*compfileread = NULL;
 	HW_component *compnodelist = NULL;
 	char	tav = '0';
-	char *nextline = NULL,*laststring = "Finalize";
+	char *nextline = NULL;
 	char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
 	orderfileread = fopen(orderfile, "r");
 	compfileread = fopen(compfile, "r");
@@ -285,7 +285,7 @@ HW_component* new_cmp(char *name, int copynum)
 	}
 
 	strcpy(std->name, name);
-	strcpy(std->copies, copynum);
+	std->copies= copynum;
 	std->next = NULL;
 
 	return std;
