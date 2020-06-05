@@ -55,12 +55,12 @@ int main(int argc, char* argv[])
 
 			while (nextline !=NULL)
 			{
-				nextname = split(readLine)[1];
-				nextcopies = atoi(split(readLine)[2]);
+				nextname = split(readLine)[0];////////////////////////check if 0 and 1
+				nextcopies = atoi(split(readLine)[1]);
 				nextline = readLine(compfileread, tav);
 				createinlist(nextcopies, nextcopies, compnodelist);
 			}
-			continue;
+			continue;///////////////break?/////////////////////
 			// do something
 		}
 		else if (strcmp(nextorder, "Finalize") == 0)
