@@ -15,9 +15,9 @@ char *readLine(FILE *fPtrRead, char tav);
 int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
 int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn);
 int production_func(HW_component *list, char name[NAME_LENGTH], int copies);
-int fatal_func();
-int fire_func();
-char *split(char *buf);
+int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
+int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
+char *split(char *buf,int iter);
 HW_component *createinlist(char *name, int copynum, HW_component *newlist);
 HW_component *add_cmp(HW_component *head, HW_component *cmp);
 HW_component *new_cmp(char *name, int copynum);
@@ -33,16 +33,19 @@ int main(int argc, char* argv[])
 	HW_component *compnodelist = NULL;
 	char	tav = '0';
 	char *nextline = NULL;
-	char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
+	//char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
+	char orderfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\actions.txt";
+	char compfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\hw_components.txt";
+	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated_components.txt";
 	orderfileread = fopen(orderfile, "r");
 	compfileread = fopen(compfile, "r");
 	fPtrWrite = fopen(fPtr, "w");
 	if (orderfileread == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
 
-	fscanf(orderfileread, "%c", &tav);
+	//fscanf(orderfileread, "%c", &tav);
 	char *nextorder = NULL;
 	nextline = readLine(orderfileread, tav);
-	nextorder = split(readLine)[0];
+	nextorder = split(nextline,1);
 	int linecounter = 0;
 	while (!feof(orderfileread))
 	{
@@ -52,13 +55,14 @@ int main(int argc, char* argv[])
 			char *nextname = NULL;
 			int nextcopies = 0;
 			nextline = readLine(compfileread, tav);
-
 			while (nextline !=NULL)
 			{
-				nextname = split(readLine)[0];////////////////////////check if 0 and 1
-				nextcopies = atoi(split(readLine)[1]);
+				if (NULL == (nextname = malloc(LINE_LENGTH * sizeof(char) + 1)))
+					exit(1);
+				strcpy(nextname,split(nextline,0));////////////////////////check if 0 and 1
+				nextcopies = atoi(split(nextline,1));
 				nextline = readLine(compfileread, tav);
-				createinlist(nextcopies, nextcopies, compnodelist);
+				createinlist(nextname, nextcopies, compnodelist);
 			}
 			continue;///////////////break?/////////////////////
 			// do something
@@ -72,35 +76,41 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
 			char oldname[NAME_LENGTH];
-			strcpy(oldname, split(readLine)[1]);
+			strcpy(oldname, split(nextline,2));
 			char newname[NAME_LENGTH];/////////check this
-			strcpy(newname, split(readLine)[2]);
+			strcpy(newname, split(nextline,3));
 			rename(oldname, newname);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(readLine)[1]);
-			int copiestoreturn= atoi(split(readLine)[2]);
+			strcpy(name, split(nextline,2));
+			int copiestoreturn= atoi(split(nextline,3));
 			returnd_from_cos_func(compnodelist,name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Production") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(readLine)[1]);
-			int copiestoreturn = atoi(split(readLine)[2]);
+			strcpy(name, split(nextline,2));
+			int copiestoreturn = atoi(split(nextline,3));
 			production_func(compnodelist, name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
 		{
-			// do something else
+			char name[NAME_LENGTH];
+			strcpy(name, split(nextline,2));
+			int mal_num = atoi(split(nextline,3));
+			fatal_func(compnodelist, name, mal_num);
 		}
 		else if (strcmp(nextorder, "Fire") == 0)
 		{
-			// do something else
+			char name[NAME_LENGTH];
+			strcpy(name, split(nextline,2));
+			int mal_num = atoi(split(nextline,3));
+			fire_func(compnodelist, name, mal_num);
 		}
 		/* more else if clauses */
 		else /* default: */
@@ -110,7 +120,7 @@ int main(int argc, char* argv[])
 
 		//nextline = readLine(orderfileread, fPtrWrite, tav);
 		nextline = readLine(orderfileread, tav);
-		nextorder = split(readLine)[0];
+		nextorder = split(nextline,1);
 
 	}
 	fclose(orderfileread);
@@ -149,29 +159,41 @@ int production_func(HW_component *list, char name[NAME_LENGTH], int copies)
 	returnd_from_cos_func(list, name, copies);
 	return 0;
 }
-int fatal_func()
+int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 {
-
+	int i;
+	HW_component *nodetochange = NULL;
+	nodetochange = find(list, name);
+	if (nodetochange != NULL)
+	{
+		if (mal_num > nodetochange->copies)
+			nodetochange->copies = 0;
+		else
+			nodetochange->copies = nodetochange->copies - mal_num;
+	}
 }
-int fire_func()
+int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 {
-
+	fatal_func(list, name, mal_num);
 }
 
 char *readLine(FILE *fPtrRead, char tav)
 {
 	char *temp = NULL;
+
 	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
 		exit(1);
 	int len = 0;
 	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
 	{
-		temp[len] += tav;
 		fscanf(fPtrRead, "%c", &tav);
+		temp[len] = tav;
 		len++;
 	}
 	return temp;
 }
+
+
 void printlisttofile(HW_component *list, FILE *fPtrWrite,int size)
 {
 	char *temp = NULL;
@@ -282,14 +304,11 @@ HW_component* new_cmp(char *name, int copynum)
 {
 	HW_component *std = NULL;
 
-	std = (HW_component*)malloc(sizeof(HW_component));
-	if (std == NULL)
-	{
-		printf("Memory allocation error!\n");
-		return NULL;
-	}
+	if(NULL==(std = (HW_component*)malloc(sizeof(HW_component))))
+		exit(1);
 
 	strcpy(std->name, name);
+	free(name);
 	std->copies= copynum;
 	std->next = NULL;
 
@@ -317,17 +336,35 @@ HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 	return add_cmp(newlist,new_cmp(name, copynum));
 }
 
-char *split(char *buf)
+char *split(char *buf, int iter)
 {
 	int i = 0;
-	char *p = strtok(buf, "$$$");
-	char *array[LINE_LENGTH];
+	int dollar = 0;
+	if (strchr(buf, '$')) { dollar = 1; }
 
-	while (p != NULL && *p !='\n')
-	{
-		array[i++] = p;
-		p = strtok(NULL, "$$$");
+	//char *array[LINE_LENGTH];
+	char *temp = NULL;
+	char newval[LINE_LENGTH];
+	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
+		exit(1);
+
+	strcpy(temp, buf);
+
+	char *p = strtok(buf, "$$$");
+
+	if (dollar) {
+		while (p != NULL && *p != '\n' && i < iter)
+		{
+			//array[i++] = p;
+			p = strtok(NULL, " $$$ ");
+			i++;
+		}
 	}
 
-	return array;
+
+	p = strtok(p, "\n");
+	strcpy(newval, p);
+	strcpy(buf, temp);
+	free(temp);
+	return newval;
 }
