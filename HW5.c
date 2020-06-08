@@ -25,9 +25,10 @@ void free_list(HW_component *head);
 HW_component* find(HW_component *head, char *val);
 HW_component* sort_alpha(HW_component *head);
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
-void printlisttofile(HW_component *list, FILE *fPtrWrite, int size);
+void printlisttofile(HW_component *list, FILE *fPtrWrite);
 void trimTrailing(char * str);
 void trimLeading(char * str);
+int length(const HW_component *head);
 
 int main(int argc, char* argv[])
 {
@@ -47,10 +48,8 @@ int main(int argc, char* argv[])
 	char *nextorder = NULL;
 	nextline = readLine(orderfileread, tav);
 	nextorder = split(nextline, 1);
-	int linecounter = 0;
 	while (!feof(orderfileread))
 	{
-		linecounter++;
 		printf("%s",nextline);
 
 		if (strcmp(nextorder, "Initialize") == 0)
@@ -73,7 +72,7 @@ int main(int argc, char* argv[])
 		}
 		else if (strcmp(nextorder, "Finalize") == 0)
 		{
-			printlisttofile(compnodelist, fPtrWrite, linecounter);
+			printlisttofile(compnodelist, fPtrWrite);
 			free_list(compnodelist);
 			break;
 		}
@@ -207,20 +206,33 @@ char *readLine(FILE *fPtrRead, char tav)
 	//printf(temp);
 	return temp;
 }
-void printlisttofile(HW_component *list, FILE *fPtrWrite, int size)
+
+int length(const HW_component *head) {
+	int count = 0;
+	HW_component *iter;
+	for (iter = head; iter != NULL; iter = iter->next) { count++; }
+	return count;
+}
+
+void printlisttofile(HW_component *list, FILE *fPtrWrite)
 {
 	char *temp = NULL;
-	char formated[LINE_LENGTH] = "";
+	char *formated = NULL;
+	int size = length(list);
 	if (NULL == (temp = malloc(size * LINE_LENGTH * sizeof(char) + 1)))
+		exit(1);
+	if (NULL == (formated = malloc(LINE_LENGTH * sizeof(char) + 1)))
 		exit(1);
 	for (HW_component *iter = list; iter != NULL; iter = iter->next)
 	{
-		sprintf(formated, "\n%s $$$ %d", iter->name, iter->copies);
+		sprintf(formated, "%s $$$ %d\n", iter->name, iter->copies);
 		strcat(temp, formated);
 	}
+	trimTrailing(temp);
+	free(formated);
 	fprintf(fPtrWrite, "%s", temp);
 	fclose(fPtrWrite);
-	///////////////////////////////////add \0?
+	free(temp);
 }
 HW_component* sort_alpha(HW_component *head)
 {
@@ -300,11 +312,14 @@ HW_component *delete(HW_component *head, char *val)
 /* Free a list of comps */
 void free_list(HW_component *head)
 {
-	if (head != NULL)
-	{
-		free_list(head->next);
-		free(head);
-	}
+	HW_component *temp = NULL;
+
+		while (head != NULL)
+		{
+			temp = head;
+			head = head->next;
+			free(temp);
+		}
 }
 
 /* Allocate a new comps */
@@ -438,3 +453,4 @@ void trimLeading(char * str)
 		str[i] = '\0'; // Make sure that string is NULL terminated
 	}
 }
+
