@@ -26,6 +26,8 @@ HW_component* find(HW_component *head, char *val);
 HW_component* sort_alpha(HW_component *head);
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
 void printlisttofile(HW_component *list, FILE *fPtrWrite, int size);
+void trimTrailing(char * str);
+void trimLeading(char * str);
 
 int main(int argc, char* argv[])
 {
@@ -55,14 +57,14 @@ int main(int argc, char* argv[])
 			int nextcopies = 0;
 			nextline = readLine(compfileread, tav);
 
-			while (nextline != NULL)
+			while (!feof(compfileread))
 			{
 				nextname = split(nextline, 0);////////////////////////check if 0 and 1
 				nextcopies = atoi(split(nextline, 1));
 				nextline = readLine(compfileread, tav);
-				createinlist(nextname, nextcopies, compnodelist);
+				compnodelist=createinlist(nextname, nextcopies, compnodelist);
 			}
-			continue;///////////////break?/////////////////////
+			//continue;///////////////break?/////////////////////
 			// do something
 		}
 		else if (strcmp(nextorder, "Finalize") == 0)
@@ -83,8 +85,8 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 2));
-			int copiestoreturn = atoi(split(nextline, 3));
+			strcpy(name, split(nextline, 1));
+			int copiestoreturn = atoi(split(nextline, 2));
 			returnd_from_cos_func(compnodelist, name, copiestoreturn);
 			// do something else
 		}
@@ -118,7 +120,7 @@ int main(int argc, char* argv[])
 
 		//nextline = readLine(orderfileread, fPtrWrite, tav);
 		nextline = readLine(orderfileread, tav);
-		nextorder = split(nextline, 1);
+		nextorder = split(nextline, 0);
 
 	}
 	fclose(orderfileread);
@@ -335,7 +337,8 @@ HW_component *add_cmp(HW_component *head, HW_component *cmp)
 
 HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 {
-	return add_cmp(newlist, new_cmp(name, copynum));
+	HW_component *toreturn = add_cmp(newlist, new_cmp(name, copynum));
+	return toreturn;
 }
 
 char *split(char *buf, int iter)
@@ -356,14 +359,67 @@ char *split(char *buf, int iter)
 		while (p != NULL && *p != '\n' && i < iter)
 		{
 			//array[i++] = p;
-			p = strtok(NULL, " $$$ ");
+			p = strtok(NULL, "$$$");
 			i++;
 		}
+		trimLeading(p);
+		trimTrailing(p);
 	}
 
+	else
+		p = strtok(p, "\n");
 
-	p = strtok(p, "\n");
 	//strcpy(buf, temp);
 	//free(temp);
 	return p;
+}
+/**
+ * Remove trailing white space characters from string
+ */
+void trimTrailing(char * str)
+{
+	int index, i;
+
+	/* Set default index */
+	index = -1;
+
+	/* Find last index of non-white space character */
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] != ' ' && str[i] != '\t' && str[i] != '\n')
+		{
+			index = i;
+		}
+
+		i++;
+	}
+
+	/* Mark next character to last non-white space character as NULL */
+	str[index + 1] = '\0';
+}
+void trimLeading(char * str)
+{
+	int index, i, j;
+
+	index = 0;
+
+	/* Find last index of whitespace character */
+	while (str[index] == ' ' || str[index] == '\t' || str[index] == '\n' || str[index] == NULL)
+	{
+		index++;
+	}
+
+
+	if (index != 0)
+	{
+		/* Shit all trailing characters to its left */
+		i = 0;
+		while (str[i + index] != '\0')
+		{
+			str[i] = str[i + index];
+			i++;
+		}
+		str[i] = '\0'; // Make sure that string is NULL terminated
+	}
 }
