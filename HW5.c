@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	//char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
 	char orderfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\actions.txt";
 	char compfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\hw_components.txt";
-	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated_components.txt";
+	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated222_components.txt";
 	orderfileread = fopen(orderfile, "r");
 	compfileread = fopen(compfile, "r");
 	fPtrWrite = fopen(fPtr, "w");
@@ -51,6 +51,8 @@ int main(int argc, char* argv[])
 	while (!feof(orderfileread))
 	{
 		linecounter++;
+		printf("%s",nextline);
+
 		if (strcmp(nextorder, "Initialize") == 0)
 		{
 			char *nextname = NULL;
@@ -64,6 +66,8 @@ int main(int argc, char* argv[])
 				nextline = readLine(compfileread, tav);
 				compnodelist=createinlist(nextname, nextcopies, compnodelist);
 			}
+			fclose(compfileread);
+
 			//continue;///////////////break?/////////////////////
 			// do something
 		}
@@ -76,9 +80,9 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
 			char oldname[NAME_LENGTH];
-			strcpy(oldname, split(nextline, 2));
+			strcpy(oldname, split(nextline, 1));
 			char newname[NAME_LENGTH];/////////check this
-			strcpy(newname, split(nextline, 3));
+			strcpy(newname, split(nextline, 2));
 			rename(oldname, newname);
 			// do something else
 		}
@@ -93,23 +97,23 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Production") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 2));
-			int copiestoreturn = atoi(split(nextline, 3));
+			strcpy(name, split(nextline, 1));
+			int copiestoreturn = atoi(split(nextline, 2));
 			production_func(compnodelist, name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 2));
-			int mal_num = atoi(split(nextline, 3));
+			strcpy(name, split(nextline, 1));
+			int mal_num = atoi(split(nextline, 2));
 			fatal_func(compnodelist, name, mal_num);
 		}
 		else if (strcmp(nextorder, "Fire") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 2));
-			int mal_num = atoi(split(nextline, 3));
+			strcpy(name, split(nextline, 1));
+			int mal_num = atoi(split(nextline, 2));
 			fire_func(compnodelist, name, mal_num);
 		}
 		/* more else if clauses */
@@ -121,11 +125,22 @@ int main(int argc, char* argv[])
 		//nextline = readLine(orderfileread, fPtrWrite, tav);
 		nextline = readLine(orderfileread, tav);
 		nextorder = split(nextline, 0);
+		if (!feof(orderfileread))
+		{
+			nextorder = "Finalize";
+		}
+		_CrtDumpMemoryLeaks();
 
 	}
 	fclose(orderfileread);
-	fclose(compfileread);
 	fclose(fPtrWrite);
+}
+
+HW_component *find(HW_component *head, char *val)
+{
+	while (head != NULL && strcmp(head->name, val) != 0)
+		head = head->next;
+	return head;
 }
 
 int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
@@ -189,6 +204,7 @@ char *readLine(FILE *fPtrRead, char tav)
 		temp[len] = tav;
 		len++;
 	}
+	//printf(temp);
 	return temp;
 }
 void printlisttofile(HW_component *list, FILE *fPtrWrite, int size)
@@ -202,10 +218,9 @@ void printlisttofile(HW_component *list, FILE *fPtrWrite, int size)
 		sprintf(formated, "\n%s $$$ %d", iter->name, iter->copies);
 		strcat(temp, formated);
 	}
-	strcat(temp, '\0');
 	fprintf(fPtrWrite, "%s", temp);
 	fclose(fPtrWrite);
-
+	///////////////////////////////////add \0?
 }
 HW_component* sort_alpha(HW_component *head)
 {
@@ -280,11 +295,7 @@ HW_component *delete(HW_component *head, char *val)
 	return head;
 }
 
-HW_component* find(HW_component *head, char *val) {
-	while (head != NULL && strcmp(head->name, val) != 0)
-		head = head->next;
-	return head;
-}
+
 
 /* Free a list of comps */
 void free_list(HW_component *head)
@@ -362,8 +373,12 @@ char *split(char *buf, int iter)
 			p = strtok(NULL, "$$$");
 			i++;
 		}
-		trimLeading(p);
-		trimTrailing(p);
+		if (p != NULL)
+		{
+
+			trimLeading(p);
+			trimTrailing(p);
+		}
 	}
 
 	else
