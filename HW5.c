@@ -17,7 +17,7 @@ int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copies
 int production_func(HW_component *list, char name[NAME_LENGTH], int copies);
 int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
 int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
-char *split(char *buf,int iter);
+char *split(char *buf, int iter);
 HW_component *createinlist(char *name, int copynum, HW_component *newlist);
 HW_component *add_cmp(HW_component *head, HW_component *cmp);
 HW_component *new_cmp(char *name, int copynum);
@@ -29,7 +29,7 @@ void printlisttofile(HW_component *list, FILE *fPtrWrite, int size);
 
 int main(int argc, char* argv[])
 {
-	FILE	*orderfileread = NULL,*fPtrWrite = NULL,*compfileread = NULL;
+	FILE	*orderfileread = NULL, *fPtrWrite = NULL, *compfileread = NULL;
 	HW_component *compnodelist = NULL;
 	char	tav = '0';
 	char *nextline = NULL;
@@ -42,10 +42,9 @@ int main(int argc, char* argv[])
 	fPtrWrite = fopen(fPtr, "w");
 	if (orderfileread == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
 
-	//fscanf(orderfileread, "%c", &tav);
 	char *nextorder = NULL;
 	nextline = readLine(orderfileread, tav);
-	nextorder = split(nextline,1);
+	nextorder = split(nextline, 1);
 	int linecounter = 0;
 	while (!feof(orderfileread))
 	{
@@ -55,12 +54,11 @@ int main(int argc, char* argv[])
 			char *nextname = NULL;
 			int nextcopies = 0;
 			nextline = readLine(compfileread, tav);
-			while (nextline !=NULL)
+
+			while (nextline != NULL)
 			{
-				if (NULL == (nextname = malloc(LINE_LENGTH * sizeof(char) + 1)))
-					exit(1);
-				strcpy(nextname,split(nextline,0));////////////////////////check if 0 and 1
-				nextcopies = atoi(split(nextline,1));
+				nextname = split(nextline, 0);////////////////////////check if 0 and 1
+				nextcopies = atoi(split(nextline, 1));
 				nextline = readLine(compfileread, tav);
 				createinlist(nextname, nextcopies, compnodelist);
 			}
@@ -76,40 +74,40 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
 			char oldname[NAME_LENGTH];
-			strcpy(oldname, split(nextline,2));
+			strcpy(oldname, split(nextline, 2));
 			char newname[NAME_LENGTH];/////////check this
-			strcpy(newname, split(nextline,3));
+			strcpy(newname, split(nextline, 3));
 			rename(oldname, newname);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline,2));
-			int copiestoreturn= atoi(split(nextline,3));
-			returnd_from_cos_func(compnodelist,name, copiestoreturn);
+			strcpy(name, split(nextline, 2));
+			int copiestoreturn = atoi(split(nextline, 3));
+			returnd_from_cos_func(compnodelist, name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Production") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline,2));
-			int copiestoreturn = atoi(split(nextline,3));
+			strcpy(name, split(nextline, 2));
+			int copiestoreturn = atoi(split(nextline, 3));
 			production_func(compnodelist, name, copiestoreturn);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline,2));
-			int mal_num = atoi(split(nextline,3));
+			strcpy(name, split(nextline, 2));
+			int mal_num = atoi(split(nextline, 3));
 			fatal_func(compnodelist, name, mal_num);
 		}
 		else if (strcmp(nextorder, "Fire") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline,2));
-			int mal_num = atoi(split(nextline,3));
+			strcpy(name, split(nextline, 2));
+			int mal_num = atoi(split(nextline, 3));
 			fire_func(compnodelist, name, mal_num);
 		}
 		/* more else if clauses */
@@ -120,7 +118,7 @@ int main(int argc, char* argv[])
 
 		//nextline = readLine(orderfileread, fPtrWrite, tav);
 		nextline = readLine(orderfileread, tav);
-		nextorder = split(nextline,1);
+		nextorder = split(nextline, 1);
 
 	}
 	fclose(orderfileread);
@@ -139,7 +137,7 @@ int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME
 	sort_alpha(list);
 	return 0;
 }
-int returnd_from_cos_func(HW_component *list,char name[NAME_LENGTH], int copiestoreturn)
+int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn)
 {
 	HW_component *nodetochange = NULL;
 	nodetochange = find(list, name);
@@ -180,7 +178,6 @@ int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 char *readLine(FILE *fPtrRead, char tav)
 {
 	char *temp = NULL;
-
 	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
 		exit(1);
 	int len = 0;
@@ -192,9 +189,7 @@ char *readLine(FILE *fPtrRead, char tav)
 	}
 	return temp;
 }
-
-
-void printlisttofile(HW_component *list, FILE *fPtrWrite,int size)
+void printlisttofile(HW_component *list, FILE *fPtrWrite, int size)
 {
 	char *temp = NULL;
 	char formated[LINE_LENGTH] = "";
@@ -202,11 +197,11 @@ void printlisttofile(HW_component *list, FILE *fPtrWrite,int size)
 		exit(1);
 	for (HW_component *iter = list; iter != NULL; iter = iter->next)
 	{
-		sprintf(formated,"\n%s $$$ %d", iter->name, iter->copies);
+		sprintf(formated, "\n%s $$$ %d", iter->name, iter->copies);
 		strcat(temp, formated);
 	}
 	strcat(temp, '\0');
-	fprintf(fPtrWrite, "%s", temp) ;
+	fprintf(fPtrWrite, "%s", temp);
 	fclose(fPtrWrite);
 
 }
@@ -238,7 +233,7 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 	if (head == NULL)
 		return new_node;
 
-	if (strcmp(new_node->name,head->name)<0) {
+	if (strcmp(new_node->name, head->name) < 0) {
 		new_node->next = head;
 		return new_node;
 	}
@@ -255,7 +250,7 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 	return head;
 }
 
-HW_component *delete(HW_component *head,  char *val)
+HW_component *delete(HW_component *head, char *val)
 {
 	HW_component *iter = head, *prev = NULL;
 
@@ -284,8 +279,8 @@ HW_component *delete(HW_component *head,  char *val)
 }
 
 HW_component* find(HW_component *head, char *val) {
-	while (head != NULL && strcmp(head->name,val)!=0)
-		head = head->next;    
+	while (head != NULL && strcmp(head->name, val) != 0)
+		head = head->next;
 	return head;
 }
 
@@ -304,12 +299,15 @@ HW_component* new_cmp(char *name, int copynum)
 {
 	HW_component *std = NULL;
 
-	if(NULL==(std = (HW_component*)malloc(sizeof(HW_component))))
-		exit(1);
+	std = (HW_component*)malloc(sizeof(HW_component));
+	if (std == NULL)
+	{
+		printf("Memory allocation error!\n");
+		return NULL;
+	}
 
 	strcpy(std->name, name);
-	free(name);
-	std->copies= copynum;
+	std->copies = copynum;
 	std->next = NULL;
 
 	return std;
@@ -321,7 +319,11 @@ HW_component *add_cmp(HW_component *head, HW_component *cmp)
 		return NULL;
 
 	if (head == NULL)
-		return cmp;
+	{
+		head = cmp;
+		return head;
+	}
+
 
 	tail = head;
 	while (tail->next != NULL)
@@ -333,7 +335,7 @@ HW_component *add_cmp(HW_component *head, HW_component *cmp)
 
 HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 {
-	return add_cmp(newlist,new_cmp(name, copynum));
+	return add_cmp(newlist, new_cmp(name, copynum));
 }
 
 char *split(char *buf, int iter)
@@ -342,15 +344,13 @@ char *split(char *buf, int iter)
 	int dollar = 0;
 	if (strchr(buf, '$')) { dollar = 1; }
 
-	//char *array[LINE_LENGTH];
 	char *temp = NULL;
-	char newval[LINE_LENGTH];
 	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
 		exit(1);
 
 	strcpy(temp, buf);
 
-	char *p = strtok(buf, "$$$");
+	char *p = strtok(temp, "$$$");
 
 	if (dollar) {
 		while (p != NULL && *p != '\n' && i < iter)
@@ -363,8 +363,7 @@ char *split(char *buf, int iter)
 
 
 	p = strtok(p, "\n");
-	strcpy(newval, p);
-	strcpy(buf, temp);
-	free(temp);
-	return newval;
+	//strcpy(buf, temp);
+	//free(temp);
+	return p;
 }
