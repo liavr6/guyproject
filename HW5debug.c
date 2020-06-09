@@ -52,18 +52,11 @@ int main(int argc, char* argv[])
 	while (fgets(line, LINE_LENGTH, orderfileread) != NULL)
 	{
 		nextorder = split(line, 0);
-		if (strstr(nextorder, "Initialize") != NULL)
-		{
-			nextorder = "Initialize";
-		}
+
 
 		HW_component* last = NULL;
 
-		//while (!feof(orderfileread))
-		//{
-			//printf("%s",nextline);
-
-		if (strcmp(nextorder, "Initialize") == 0)
+		if (strstr(nextorder, "Initialize") != NULL)
 		{
 	
 			int nextcopies = 0;
@@ -83,7 +76,7 @@ int main(int argc, char* argv[])
 			//continue;///////////////break?/////////////////////
 			// do something
 		}
-		else if (strcmp(nextorder, "Finalize") == 0)
+		else if (strstr(nextorder, "Finalize") != NULL)
 		{
 			printlisttofile(compnodelist, fPtrWrite);
 			free_list(compnodelist);
@@ -92,9 +85,9 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Rename") == 0)
 		{
 			char oldname[NAME_LENGTH];
-			strcpy(oldname, split(nextline, 1));
+			strcpy(oldname, split(line, 1));
 			char newname[NAME_LENGTH];/////////check this
-			strcpy(newname, split(nextline, 2));
+			strcpy(newname, split(line, 2));
 			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename1111_components.txt", "w");
 			//printlisttofile(compnodelist, fPtrWrite);
 			rename_func(compnodelist, oldname, newname);
@@ -105,8 +98,8 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int copiestoreturn = atoi(split(nextline, 2));
+			strcpy(name, split(line, 1));
+			int copiestoreturn = atoi(split(line, 2));
 			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\returnd23123_components.txt", "w");
 			//printlisttofile(compnodelist, fPtrWrite);
 			returnd_from_cos_func(compnodelist, name, copiestoreturn);
@@ -117,8 +110,8 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Production") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int copiestoreturn = atoi(split(nextline, 2));
+			strcpy(name, split(line, 1));
+			int copiestoreturn = atoi(split(line, 2));
 			production_func(compnodelist, name, copiestoreturn);
 			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\production_components.txt", "w");
 			//printlisttofile(compnodelist, fPtrWrite);
@@ -127,8 +120,8 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int mal_num = atoi(split(nextline, 2));
+			strcpy(name, split(line, 1));
+			int mal_num = atoi(split(line, 2));
 			fatal_func(compnodelist, name, mal_num);
 			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\fatal_components.txt", "w");
 			//printlisttofile(compnodelist, fPtrWrite);
@@ -136,8 +129,8 @@ int main(int argc, char* argv[])
 		else if (strcmp(nextorder, "Fire") == 0)
 		{
 			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int mal_num = atoi(split(nextline, 2));
+			strcpy(name, split(line, 1));
+			int mal_num = atoi(split(line, 2));
 			fire_func(compnodelist, name, mal_num);
 			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\fire_components.txt", "w");
 			//printlisttofile(compnodelist, fPtrWrite);
@@ -151,23 +144,14 @@ int main(int argc, char* argv[])
 		//nextline = readLine(orderfileread, fPtrWrite, tav);
 		//nextline = readLine(orderfileread, tav);
 		//nextorder = split(nextline, 0);
-		if (strstr(nextorder, "Initialize") != NULL)
-		{
-			nextorder = "Finalize";
-		}
-		//}
-		//compnodelist = last;
 
-		if (strcmp(nextorder, "Finalize") == 0)
-		{
-			printlisttofile(compnodelist, fPtrWrite);
-			free_list(compnodelist);
-		}
+
+
 		_CrtDumpMemoryLeaks();
-		fclose(orderfileread);
-		fclose(fPtrWrite);
 
 	}
+	fclose(orderfileread);
+	fclose(fPtrWrite);
 }
 
 HW_component *find(HW_component *head, char *val)
