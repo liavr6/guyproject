@@ -339,7 +339,7 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\add2_components.txt", "w");
 	printlisttofile(head, fPtrWrite);
 	fclose(fPtrWrite);
-	if (strcmp(new_node->name, head->name) < 0) {
+	if (strcmp(new_node->name, head->name) <= 0) {
 		new_node->next = head;
 		return new_node;
 	}
@@ -347,16 +347,16 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 	printlisttofile(head, fPtrWrite);
 	fclose(fPtrWrite);
 	iter = head;
-	while (iter != NULL && strcmp(new_node->name, iter->name) >= 0) {
+	while (iter != NULL && strcmp(new_node->name, iter->name) > 0) {
 		printf("%d %s %s %s\n", strcmp(new_node->name, iter->name),new_node->name, iter->name,head);
 		prev = iter;
 		iter = iter->next;
 	}
-	printf("%d %s %s %s\n", strcmp(new_node->name, iter->name), new_node->name, iter->name);
+	//printf("%d %s %s %s\n", strcmp(new_node->name, iter->name), new_node->name, iter->name);
 	prev->next = new_node;
 	printf("%s\n", prev);
 	new_node->next = iter;
-	head = head->next;/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//head = head->next;/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\add4_components.txt", "w");
 	printlisttofile(head, fPtrWrite);
 	fclose(fPtrWrite);
