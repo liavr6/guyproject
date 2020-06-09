@@ -19,16 +19,16 @@ int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
 int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
 char *split(char *buf, int iter);
 HW_component *createinlist(char *name, int copynum, HW_component *newlist);
-HW_component *add_cmp(HW_component *head, HW_component *cmp);
+//HW_component *add_cmp(HW_component *head, HW_component *cmp);
 HW_component *new_cmp(char *name, int copynum);
 void free_list(HW_component *head);
 HW_component* find(HW_component *head, char *val);
-HW_component* sort_alpha(HW_component *head);
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
 void printlisttofile(HW_component *list, FILE *fPtrWrite);
 void trimTrailing(char * str);
 void trimLeading(char * str);
 int length(const HW_component *head);
+HW_component *delete(HW_component *head, char *val);
 
 int main(int argc, char* argv[])
 {
@@ -48,7 +48,10 @@ int main(int argc, char* argv[])
 	char *nextorder = NULL;
 	nextline = readLine(orderfileread, tav);
 	nextorder = split(nextline, 1);
-
+	if (strstr(nextorder, "Initialize") != NULL)
+	{
+		nextorder = "Initialize";
+	}
 
 	HW_component* last = NULL;
 
@@ -67,12 +70,13 @@ int main(int argc, char* argv[])
 				nextname = split(nextline, 0);////////////////////////check if 0 and 1
 				nextcopies = atoi(split(nextline, 1));
 				nextline = readLine(compfileread, tav);
-				compnodelist=createinlist(nextname, nextcopies, compnodelist);
+				compnodelist = createinlist(nextname, nextcopies, compnodelist);
 			}
 			fclose(compfileread);
 			last = compnodelist;
-			FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
+			fclose(fPtrWrite);
 			//continue;///////////////break?/////////////////////
 			// do something
 		}
@@ -88,11 +92,11 @@ int main(int argc, char* argv[])
 			strcpy(oldname, split(nextline, 1));
 			char newname[NAME_LENGTH];/////////check this
 			strcpy(newname, split(nextline, 2));
-			FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename1111_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
-			rename_func(compnodelist,oldname, newname);
-			fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename2_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename1111_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
+			rename_func(compnodelist, oldname, newname);
+			//fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename2_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Returned_from_customer") == 0)
@@ -100,12 +104,12 @@ int main(int argc, char* argv[])
 			char name[NAME_LENGTH];
 			strcpy(name, split(nextline, 1));
 			int copiestoreturn = atoi(split(nextline, 2));
-			FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\returnd23123_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\returnd23123_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
 			returnd_from_cos_func(compnodelist, name, copiestoreturn);
 			// do something else
-			fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\returnd_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\returnd_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
 		}
 		else if (strcmp(nextorder, "Production") == 0)
 		{
@@ -113,8 +117,8 @@ int main(int argc, char* argv[])
 			strcpy(name, split(nextline, 1));
 			int copiestoreturn = atoi(split(nextline, 2));
 			production_func(compnodelist, name, copiestoreturn);
-			FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\production_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\production_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
 			// do something else
 		}
 		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
@@ -123,8 +127,8 @@ int main(int argc, char* argv[])
 			strcpy(name, split(nextline, 1));
 			int mal_num = atoi(split(nextline, 2));
 			fatal_func(compnodelist, name, mal_num);
-			FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\fatal_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\fatal_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
 		}
 		else if (strcmp(nextorder, "Fire") == 0)
 		{
@@ -132,8 +136,8 @@ int main(int argc, char* argv[])
 			strcpy(name, split(nextline, 1));
 			int mal_num = atoi(split(nextline, 2));
 			fire_func(compnodelist, name, mal_num);
-			FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\fire_components.txt", "w");
-			printlisttofile(compnodelist, fPtrWrite);
+			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\fire_components.txt", "w");
+			//printlisttofile(compnodelist, fPtrWrite);
 		}
 		/* more else if clauses */
 		else /* default: */
@@ -172,32 +176,29 @@ HW_component *find(HW_component *head, char *val)
 
 int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
 {
-	FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renamebefore_components.txt", "w");
-	printlisttofile(list, fPtrWrite);
-	fclose(fPtrWrite);
-	HW_component *nodetochange = NULL;
-	nodetochange = find(list, oldname);
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renamebefore3_components.txt", "w");
-	printlisttofile(list, fPtrWrite);
-	fclose(fPtrWrite);
-	if (nodetochange != NULL)
+	HW_component *iter = list, *prev = NULL;
+
+	if (list == NULL)
+		return list;
+	iter = list;
+	while(iter !=NULL && strcmp(iter->name, newname) !=0)
 	{
-		strcpy(nodetochange->name, newname);
+		prev = iter;
+		iter = iter->next;
 	}
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renamebefore2_components.txt", "w");
-	printlisttofile(list, fPtrWrite);
-	fclose(fPtrWrite);
-	sort_alpha(list);
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renameafter_components.txt", "w");
-	printlisttofile(list, fPtrWrite);
-	fclose(fPtrWrite);
-	return 0;
+	if (iter != NULL)
+	{
+		strcpy(iter->name, newname);
+		if (iter == list)
+			list = list->next;
+		else
+			prev->next = iter->next;
+		list = add_and_sort_alpha(list, iter);
+	}
+	return list;
 }
 int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn)
 {
-	FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renameafterddfffdfdfdfd_components.txt", "w");
-	printlisttofile(list, fPtrWrite);
-	fclose(fPtrWrite);
 	HW_component *nodetochange = NULL;
 	nodetochange = find(list, name);
 	if (nodetochange != NULL)
@@ -206,14 +207,14 @@ int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copies
 	}
 	else
 	{
+
 		createinlist(name, copiestoreturn, list);
 	}
 
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renam123456789_components.txt", "w");
-	printlisttofile(list, fPtrWrite);
-	fclose(fPtrWrite);
-	sort_alpha(list);
-
+	//fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\renam123456789_components.txt", "w");
+	//printlisttofile(list, fPtrWrite);
+	//fclose(fPtrWrite);
+	//sort(list);
 	//printlisttofile(list, fPtrWrite);/////////////////////////////////////////////////////////////////
 
 	return 0;
@@ -241,19 +242,20 @@ int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 	fatal_func(list, name, mal_num);
 }
 
+
 char *readLine(FILE *fPtrRead, char tav)
 {
 	char *temp = NULL;
 	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
 		exit(1);
 	int len = 0;
+	fscanf(fPtrRead, "%c", &tav);
 	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
 	{
-		fscanf(fPtrRead, "%c", &tav);
 		temp[len] = tav;
+		fscanf(fPtrRead, "%c", &tav);
 		len++;
 	}
-	//printf(temp);
 	return temp;
 }
 
@@ -263,149 +265,6 @@ int length(const HW_component *head) {
 	for (iter = head; iter != NULL; iter = iter->next) { count++; }
 	return count;
 }
-
-void printlisttofile(HW_component *list, FILE *fPtrWrite)
-{
-	char *temp = NULL;
-	char *formated = NULL;
-	int size = length(list);
-	if (NULL == (temp = malloc(size * LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	if (NULL == (formated = malloc(LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	for (HW_component *iter = list; iter != NULL; iter = iter->next)
-	{
-		//printf(formated, "%s $$$ %d\n", iter->name, iter->copies);
-		sprintf(formated, "%s $$$ %d\n", iter->name, iter->copies);
-		strcat(temp, formated);
-	}
-	trimTrailing(temp);
-	free(formated);
-	fprintf(fPtrWrite, "%s", temp);
-	fclose(fPtrWrite);
-	free(temp);
-}
-HW_component* sort_alpha(HW_component *head)
-{
-	FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\sortfuck1_components.txt", "w");
-	printlisttofile(head, fPtrWrite);
-	fclose(fPtrWrite);
-
-
-	HW_component *iter = head, *prev = NULL;
-	if (head == NULL)
-		return NULL;
-
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\sortfuck2_components.txt", "w");
-	printlisttofile(head, fPtrWrite);
-	fclose(fPtrWrite);
-	for (HW_component *iter = head; iter != NULL; iter = iter->next)
-	{
-		prev = iter; iter = iter->next;
-		while (iter != NULL)
-		{
-			fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\sortfuck6_components.txt", "w");
-			printlisttofile(head, fPtrWrite);
-			fclose(fPtrWrite);
-			prev->next = iter->next;
-			fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\sortfuck4_components.txt", "w");
-			printlisttofile(head, fPtrWrite);
-			fclose(fPtrWrite);
-			head = add_and_sort_alpha(head, iter);
-			fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\sortfuck5_components.txt", "w");
-			printlisttofile(head, fPtrWrite);
-			fclose(fPtrWrite);
-			prev = iter;
-			iter = iter->next;
-		}
-		fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\sortfuck3_components.txt", "w");
-		printlisttofile(head, fPtrWrite);
-		fclose(fPtrWrite);
-		return head;
-	}
-
-
-
-}
-HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
-	HW_component* iter, *prev = NULL;
-	//HW_component* new_node = create_node(data);
-	FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\add1_components.txt", "w");
-	printlisttofile(head, fPtrWrite);
-	fclose(fPtrWrite);
-	/* incomplete, must check for failure */
-	if (head == NULL)
-		return new_node;
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\add2_components.txt", "w");
-	printlisttofile(head, fPtrWrite);
-	fclose(fPtrWrite);
-	if (strcmp(new_node->name, head->name) <= 0) {
-		new_node->next = head;
-		return new_node;
-	}
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\add3_components.txt", "w");
-	printlisttofile(head, fPtrWrite);
-	fclose(fPtrWrite);
-	iter = head;
-	while (iter != NULL && strcmp(new_node->name, iter->name) > 0) {
-		printf("%d %s %s %s\n", strcmp(new_node->name, iter->name),new_node->name, iter->name,head);
-		prev = iter;
-		iter = iter->next;
-	}
-	//printf("%d %s %s %s\n", strcmp(new_node->name, iter->name), new_node->name, iter->name);
-	prev->next = new_node;
-	printf("%s\n", prev);
-	new_node->next = iter;
-	//head = head->next;/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\add4_components.txt", "w");
-	printlisttofile(head, fPtrWrite);
-	fclose(fPtrWrite);
-	return head;
-}
-
-HW_component *delete(HW_component *head, char *val)
-{
-	HW_component *iter = head, *prev = NULL;
-
-	if (head == NULL)
-		return head;
-
-	if (head->name == val)
-	{
-		iter = head->next;
-		free(head);
-		return iter;
-	}
-	prev = iter; iter = iter->next;
-	while (iter != NULL)
-	{
-		if (iter->name == val)
-		{
-			prev->next = iter->next;
-			free(iter);
-			break;
-		}
-		prev = iter;
-		iter = iter->next;
-	}
-	return head;
-}
-
-
-
-/* Free a list of comps */
-void free_list(HW_component *head)
-{
-	HW_component *temp = NULL;
-
-		while (head != NULL)
-		{
-			temp = head;
-			head = head->next;
-			free(temp);
-		}
-}
-
 /* Allocate a new comps */
 HW_component* new_cmp(char *name, int copynum)
 {
@@ -424,30 +283,81 @@ HW_component* new_cmp(char *name, int copynum)
 
 	return std;
 }
-HW_component *add_cmp(HW_component *head, HW_component *cmp)
-{
-	HW_component *tail;
-	if (cmp == NULL)
-		return NULL;
 
-	if (head == NULL)
+void printlisttofile(HW_component *list, FILE *fPtrWrite)
+{
+	HW_component *iter=list;
+	while (iter->name != NULL)
 	{
-		head = cmp;
-		return head;
+		fprintf(fPtrWrite, "%s $$$ %d\n", iter->name, iter->copies);
+		iter = iter->next;
+	}
+}
+HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node)
+{
+	HW_component* iter, *prev = NULL;
+	//HW_component* new_node = new_cmp(name,copynum);
+	/* incomplete, must check for failure */
+	if (head == NULL)
+		return new_node;
+
+	if (strcmp(new_node->name, head->name) < 0) {
+		new_node->next = head;
+		return new_node;
 	}
 
+	iter = head;
+	while (iter != NULL && iter->name != NULL && strcmp(new_node->name, iter->name) >= 0) {
+		prev = iter;
+		iter = iter->next;
+	}
 
-	tail = head;
-	while (tail->next != NULL)
-		tail = tail->next;
-	tail->next = cmp;
+	prev->next = new_node;
+	new_node->next = iter;
 
 	return head;
 }
+/* Free a list of comps */
+void free_list(HW_component *head)
+{
+	HW_component *temp = NULL;
+
+	while (head != NULL)
+	{
+		temp = head;
+		head = head->next;
+		free(temp);
+	}
+}
+
+
+////HW_component *add_cmp(HW_component *head, HW_component *cmp)
+////{
+////	HW_component *tail;
+////	if (cmp == NULL)
+////		return NULL;
+////
+////	if (head == NULL)
+////	{
+////		head = cmp;
+////		return head;
+////	}
+////
+////
+////	tail = head;
+////	while (tail != NULL) 
+////	{
+////		tail = tail->next;
+////	}
+////	tail->next = cmp;
+////
+////	return head;
+////}
 
 HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 {
-	HW_component *toreturn = add_cmp(newlist, new_cmp(name, copynum));
+
+	HW_component *toreturn = add_and_sort_alpha(newlist, new_cmp(name,copynum));
 	return toreturn;
 }
 
@@ -538,3 +448,30 @@ void trimLeading(char * str)
 	}
 }
 
+HW_component *delete(HW_component *head, char *val)
+{
+	HW_component *iter = head, *prev = NULL;
+
+	if (head == NULL)
+		return head;
+
+	if (head->name == val)
+	{
+		iter = head->next;
+		//free(head);
+		return iter;
+	}
+	prev = iter; iter = iter->next;
+	while (iter != NULL)
+	{
+		if (iter->name == val)
+		{
+			prev->next = iter->next;
+			//free(iter);
+			break;
+		}
+		prev = iter;
+		iter = iter->next;
+	}
+	return head;
+}
