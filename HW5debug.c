@@ -46,37 +46,40 @@ int main(int argc, char* argv[])
 	if (orderfileread == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
 
 	char *nextorder = NULL;
-	nextline = readLine(orderfileread, tav);
-	nextorder = split(nextline, 1);
-	if (strstr(nextorder, "Initialize") != NULL)
+	//nextline = readLine(orderfileread, tav);
+	//nextorder = split(nextline, 1);
+	char line[LINE_LENGTH], name[NAME_LENGTH];
+	while (fgets(line, LINE_LENGTH, orderfileread) != NULL)
 	{
-		nextorder = "Initialize";
-	}
+		nextorder = split(line, 0);
+		if (strstr(nextorder, "Initialize") != NULL)
+		{
+			nextorder = "Initialize";
+		}
 
-	HW_component* last = NULL;
+		HW_component* last = NULL;
 
-	while (!feof(orderfileread))
-	{
-		//printf("%s",nextline);
+		//while (!feof(orderfileread))
+		//{
+			//printf("%s",nextline);
 
 		if (strcmp(nextorder, "Initialize") == 0)
 		{
-			char *nextname = NULL;
+	
 			int nextcopies = 0;
-			nextline = readLine(compfileread, tav);
-
-			while (!feof(compfileread))
+			
+			char linecomp[LINE_LENGTH], namecomp[NAME_LENGTH];
+			while (fgets(linecomp, LINE_LENGTH, compfileread) != NULL)
 			{
-				nextname = split(nextline, 0);////////////////////////check if 0 and 1
-				nextcopies = atoi(split(nextline, 1));
-				nextline = readLine(compfileread, tav);
-				compnodelist = createinlist(nextname, nextcopies, compnodelist);
+				strcpy(namecomp,split(linecomp, 0));////////////////////////check if 0 and 1
+				nextcopies = atoi(split(linecomp, 1));
+				//linecomp = readLine(compfileread, tav);
+				compnodelist = createinlist(namecomp, nextcopies, compnodelist);
 			}
 			fclose(compfileread);
 			last = compnodelist;
 			//FILE *fPtrWrite = fopen("C:\\Users\\Liav\\Desktop\\txtfiles\\rename_components.txt", "w");
 			//printlisttofile(compnodelist, fPtrWrite);
-			fclose(fPtrWrite);
 			//continue;///////////////break?/////////////////////
 			// do something
 		}
@@ -146,23 +149,25 @@ int main(int argc, char* argv[])
 		}
 
 		//nextline = readLine(orderfileread, fPtrWrite, tav);
-		nextline = readLine(orderfileread, tav);
-		nextorder = split(nextline, 0);
-		if (feof(orderfileread))
+		//nextline = readLine(orderfileread, tav);
+		//nextorder = split(nextline, 0);
+		if (strstr(nextorder, "Initialize") != NULL)
 		{
 			nextorder = "Finalize";
 		}
-	}
-	//compnodelist = last;
-	if (strcmp(nextorder, "Finalize") == 0)
-	{
-		printlisttofile(compnodelist, fPtrWrite);
-		free_list(compnodelist);
-	}
-	_CrtDumpMemoryLeaks();
-	fclose(orderfileread);
-	fclose(fPtrWrite);
+		//}
+		//compnodelist = last;
 
+		if (strcmp(nextorder, "Finalize") == 0)
+		{
+			printlisttofile(compnodelist, fPtrWrite);
+			free_list(compnodelist);
+		}
+		_CrtDumpMemoryLeaks();
+		fclose(orderfileread);
+		fclose(fPtrWrite);
+
+	}
 }
 
 HW_component *find(HW_component *head, char *val)
@@ -243,21 +248,21 @@ int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 }
 
 
-char *readLine(FILE *fPtrRead, char tav)
-{
-	char *temp = NULL;
-	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	int len = 0;
-	fscanf(fPtrRead, "%c", &tav);
-	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
-	{
-		temp[len] = tav;
-		fscanf(fPtrRead, "%c", &tav);
-		len++;
-	}
-	return temp;
-}
+//char *readLine(FILE *fPtrRead, char tav)
+//{
+//	char *temp = NULL;
+//	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
+//		exit(1);
+//	int len = 0;
+//	fscanf(fPtrRead, "%c", &tav);
+//	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
+//	{
+//		temp[len] = tav;
+//		fscanf(fPtrRead, "%c", &tav);
+//		len++;
+//	}
+//	return temp;
+//}
 
 int length(const HW_component *head) {
 	int count = 0;
@@ -287,8 +292,9 @@ HW_component* new_cmp(char *name, int copynum)
 void printlisttofile(HW_component *list, FILE *fPtrWrite)
 {
 	HW_component *iter=list;
-	while (iter->name != NULL)
+	while (iter != NULL)
 	{
+		//fprintf(fPtrWrite, "%s", iter->name);
 		fprintf(fPtrWrite, "%s $$$ %d\n", iter->name, iter->copies);
 		iter = iter->next;
 	}
