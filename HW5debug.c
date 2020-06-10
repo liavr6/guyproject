@@ -26,6 +26,11 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
 void printlisttofile(HW_component *list, FILE *fPtrWrite);
 int length(const HW_component *head);
 
+
+
+//Input:recives input values from the command line from user
+//return parameter:int for success and creats files of lists
+//Function functionality : it reads the orders file and acts accordingly with the right actions activating the right functions, finally after all the updates it creates and updated componnent file
 int main(int argc, char* argv[])
 {
 	FILE	*orderfileread = NULL, *fPtrWrite = NULL, *compfileread = NULL;
@@ -134,7 +139,9 @@ int main(int argc, char* argv[])
 
 	}
 
-
+//Input:recives a node of the begining of the list and a name to look for
+//return parameter:returns a HW_component pointer of the location of wanted value or null if not found
+//Function functionality : iterates over the list and comparing the names to the wanted value
 HW_component *find(HW_component *head, char *val)
 {
 	while (head != NULL && strcmp(head->name, val) != 0) {
@@ -143,7 +150,9 @@ HW_component *find(HW_component *head, char *val)
 	}
 	return head;
 }
-
+//Input:recives a pointer to a list and two strings, one to change and one to change to.
+//return parameter:returns an int for success condition
+//Function functionality : finds the relevant node in the list by name and updates its values
 int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
 {
 	HW_component *iter = list, *prev = NULL;
@@ -167,6 +176,9 @@ int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME
 	}
 	return list;
 }
+//Input:recives a pointer to a list and a string of name and an int to update the relevant node with
+//return parameter:returns an int for success condition
+//Function functionality : finds the relevant node in the list by name and updates its values
 int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn)
 {
 	HW_component *nodetochange = NULL;
@@ -183,11 +195,17 @@ int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copies
 
 	return 0;
 }
+//Input::recives a pointer to a list and a string of name and an int to update the relevant node with
+//return parameter:returns an int for success condition
+//Function functionality : recives a list and adds a component to it or updates the values of a corresponding existing one
 int production_func(HW_component *list, char name[NAME_LENGTH], int copies)
 {
 	returnd_from_cos_func(list, name, copies);
 	return 0;
 }
+//Input:
+//return parameter:returns an int for success condition
+//Function functionality : 
 int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 {
 	int i;
@@ -201,18 +219,25 @@ int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 			nodetochange->copies -= mal_num;
 	}
 }
+//Input:
+//return parameter:returns an int for success condition
+//Function functionality : 
 int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 {
 	fatal_func(list, name, mal_num);
 }
-
-
+//Input:recives a pointer to a list
+//return parameter:returns the size of the list
+//Function functionality : iterates over the list and counts each node, returns the counter value
 int length(const HW_component *head) {
 	int count = 0;
 	HW_component *iter;
 	for (iter = head; iter != NULL; iter = iter->next) { count++; }
 	return count;
 }
+//Input:a pointer to a char array which is the name and int which is the copies number
+//return parameter:HW_component pointer
+//Function functionality : creats a new struct and returns it pointer
 /* Allocate a new comps */
 HW_component* new_cmp(char *name, int copynum)
 {
@@ -232,7 +257,9 @@ HW_component* new_cmp(char *name, int copynum)
 
 	return std;
 }
-
+//Input:recives a pointer to a list and a file address 
+//return parameter:None
+//Function functionality:iterates over the list and prints it in a specified format to the file
 void printlisttofile(HW_component *list, FILE *fPtrWrite)
 {
 	HW_component *iter=list;
@@ -242,6 +269,9 @@ void printlisttofile(HW_component *list, FILE *fPtrWrite)
 		iter = iter->next;
 	}
 }
+//Input: two pointers. one for a list and one for a node
+//return parameter:HW_component pointer
+//Function functionality : iterates over the list and compares its string values until it finds the right place, then changes the pointers in the list to add it there
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node)
 {
 	HW_component* iter, *prev = NULL;
@@ -265,6 +295,9 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node)
 
 	return head;
 }
+//Input:pointer to a list of HW_component
+//return parameter: None
+//Function functionality : iterates over the list and frees its pointer's allocations
 /* Free a list of comps */
 void free_list(HW_component *head)
 {
@@ -279,14 +312,18 @@ void free_list(HW_component *head)
 	_CrtDumpMemoryLeaks();
 
 }
-
-
+//Input:recives a pointer to a list and a file address 
+//return parameter:returns a pointer to the top of the list with the added node to it
+//Function functionality : creates a new node by another function and changes the pointers of the list to add the new one in a sorted way
 HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 {
 
 	HW_component *toreturn = add_and_sort_alpha(newlist, new_cmp(name,copynum));
 	return toreturn;
 }
+//Input:pointer to a char array and int for seperated value which to return
+//return parameter: returns a char pointer to a wanted place in a string
+//Function functionality : iterates over a string and seperates it by a relevant delimiter and returns the wanted iteration
 char *split(char *buf, int iter)
 {
 	int i, partlen;
