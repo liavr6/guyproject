@@ -38,19 +38,17 @@ int main(int argc, char* argv[])
 	char compfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\hw_components.txt";
 	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated222_components.txt";
 	if (sizeof(argv) != 4) {
-		flag = 1;
 		printf("Error: invalid number of arguments (<%d> instead of 3)\n", sizeof(argv));
+		exit(1);
 	}
 
 	orderfileread = fopen(orderfile, "r");
-	if (orderfileread == NULL) { flag = 1; printf("Error: opening %s failed\n", orderfileread); }
+	if (orderfileread == NULL) {  printf("Error: opening %s failed\n", orderfile); exit(1);}
 	compfileread = fopen(compfile, "r");
-	if (compfileread == NULL) { flag = 1; printf("Error: opening %s failed\n", compfileread); }
+	if (compfileread == NULL) {  printf("Error: opening %s failed\n", compfile); exit(1);}
 	fPtrWrite = fopen(fPtr, "w");
-	if (fPtrWrite == NULL) { flag = 1; printf("Error: opening %s failed\n", fPtrWrite); }
+	if (fPtrWrite == NULL) { printf("Error: opening %s failed\n", fPtr);  exit(1);}
 
-	if (flag != 1)
-	{
 		char *nextorder = NULL;
 		char line[LINE_LENGTH], name[NAME_LENGTH];
 		while (fgets(line, LINE_LENGTH, orderfileread) != NULL)
@@ -135,7 +133,7 @@ int main(int argc, char* argv[])
 		fclose(compfileread);
 
 	}
-}
+
 
 HW_component *find(HW_component *head, char *val)
 {
