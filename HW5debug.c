@@ -224,7 +224,8 @@ HW_component* new_cmp(char *name, int copynum)
 	if (std == NULL)
 	{
 		printf("Error: memory allocation failed\n");
-		return NULL;
+		exit(1);
+		//return NULL;
 	}
 
 	strcpy(std->name, name);
