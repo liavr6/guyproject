@@ -38,10 +38,10 @@ int main(int argc, char* argv[])
 	char	tav = '0';
 	char *nextline = NULL;
 	int flag = 0;
-	//char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
-	char orderfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\actions.txt";
+	char *orderfile = argv[2], *compfile = argv[1], *fPtr = argv[3];
+	/*char orderfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\actions.txt";
 	char compfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\hw_components.txt";
-	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated222_components.txt";
+	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated222_components.txt";*/
 	if (sizeof(argv) != 4) {
 		printf("Error: invalid number of arguments (<%d> instead of 3)\n", sizeof(argv));
 		exit(1);
