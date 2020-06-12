@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <crtdbg.h>///////////////////////////////////////////////////
+
 
 // define struct
 typedef struct hw_component { char name[NAME_LENGTH]; int copies; struct hw_component *next; }HW_component;
@@ -39,9 +39,6 @@ int main(int argc, char* argv[])
 	char *nextline = NULL;
 	int flag = 0;
 	char *orderfile = argv[2], *compfile = argv[1], *fPtr = argv[3];
-	/*char orderfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\actions.txt";
-	char compfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\hw_components.txt";
-	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated222_components.txt";*/
 	if (sizeof(argv) != 4) {
 		printf("Error: invalid number of arguments (<%d> instead of 3)\n", sizeof(argv));
 		exit(1);
@@ -68,12 +65,10 @@ int main(int argc, char* argv[])
 				char linecomp[LINE_LENGTH], namecomp[NAME_LENGTH];
 				while (fgets(linecomp, LINE_LENGTH, compfileread) != NULL)
 				{
-					//_CrtDumpMemoryLeaks();
 
-					strcpy(namecomp, split(linecomp, 0));////////////////////////check if 0 and 1
+					strcpy(namecomp, split(linecomp, 0));
 					nextcopies = atoi(split(linecomp, 1));
 					compnodelist = createinlist(namecomp, nextcopies, compnodelist);
-					//free(tempdata);
 				}
 				last = compnodelist;
 
@@ -88,7 +83,7 @@ int main(int argc, char* argv[])
 			{
 				char oldname[NAME_LENGTH];
 				strcpy(oldname, split(line, 1));
-				char newname[NAME_LENGTH];/////////check this
+				char newname[NAME_LENGTH];
 				strcpy(newname, split(line, 2));
 
 				rename_func(compnodelist, oldname, newname);
@@ -136,7 +131,6 @@ int main(int argc, char* argv[])
 		fclose(orderfileread);
 		fclose(fPtrWrite);
 		fclose(compfileread);
-
 	}
 
 //Input:recives a node of the begining of the list and a name to look for
@@ -146,7 +140,6 @@ HW_component *find(HW_component *head, char *val)
 {
 	while (head != NULL && strcmp(head->name, val) != 0) {
 		head = head->next;
-		//printf("%s\n",head->name);
 	}
 	return head;
 }
@@ -160,7 +153,7 @@ int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME
 	if (list == NULL)
 		return list;
 	iter = list;
-	while(iter !=NULL && strcmp(iter->name, newname) !=0)
+	while(iter !=NULL && strcmp(iter->name, oldname) !=0)
 	{
 		prev = iter;
 		iter = iter->next;
@@ -248,7 +241,6 @@ HW_component* new_cmp(char *name, int copynum)
 	{
 		printf("Error: memory allocation failed\n");
 		exit(1);
-		//return NULL;
 	}
 
 	strcpy(std->name, name);
@@ -275,7 +267,7 @@ void printlisttofile(HW_component *list, FILE *fPtrWrite)
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node)
 {
 	HW_component* iter, *prev = NULL;
-	/* incomplete, must check for failure */
+	 
 	if (head == NULL)
 		return new_node;
 
@@ -309,7 +301,7 @@ void free_list(HW_component *head)
 		head = head->next;
 		free(temp);
 	}
-	_CrtDumpMemoryLeaks();
+
 
 }
 //Input:recives a pointer to a list and a file address 
