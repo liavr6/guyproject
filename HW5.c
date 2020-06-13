@@ -5,155 +5,174 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <crtdbg.h>///////////////////////////////////////////////////
+
 
 // define struct
 typedef struct hw_component { char name[NAME_LENGTH]; int copies; struct hw_component *next; }HW_component;
 
 
 char *readLine(FILE *fPtrRead, char tav);
-int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
-int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn);
-int production_func(HW_component *list, char name[NAME_LENGTH], int copies);
+HW_component *rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH]);
+HW_component *returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn);
+HW_component *production_func(HW_component *list, char name[NAME_LENGTH], int copies);
 int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
 int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num);
 char *split(char *buf, int iter);
 HW_component *createinlist(char *name, int copynum, HW_component *newlist);
-HW_component *add_cmp(HW_component *head, HW_component *cmp);
 HW_component *new_cmp(char *name, int copynum);
 void free_list(HW_component *head);
 HW_component* find(HW_component *head, char *val);
-HW_component* sort_alpha(HW_component *head);
 HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node);
 void printlisttofile(HW_component *list, FILE *fPtrWrite);
-void trimTrailing(char * str);
-void trimLeading(char * str);
 int length(const HW_component *head);
 
+
+
+//Input:recives input values from the command line from user
+//return parameter:int for success and creats files of lists
+//Function functionality : it reads the orders file and acts accordingly with the right actions activating the right functions, finally after all the updates it creates and updated componnent file
 int main(int argc, char* argv[])
 {
 	FILE	*orderfileread = NULL, *fPtrWrite = NULL, *compfileread = NULL;
 	HW_component *compnodelist = NULL;
 	char	tav = '0';
 	char *nextline = NULL;
-	//char orderfile = argv[2], compfile = argv[1], fPtr = argv[3];
-	char orderfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\actions.txt";
-	char compfile[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\hw_components.txt";
-	char fPtr[100] = "C:\\Users\\Liav\\Desktop\\txtfiles\\updated222_components.txt";
-	orderfileread = fopen(orderfile, "r");
-	compfileread = fopen(compfile, "r");
-	fPtrWrite = fopen(fPtr, "w");
-	if (orderfileread == NULL || fPtrWrite == NULL) { printf("File did not open. Exit..\n"); }
-
-	char *nextorder = NULL;
-	nextline = readLine(orderfileread, tav);
-	nextorder = split(nextline, 1);
-	while (!feof(orderfileread))
-	{
-		printf("%s",nextline);
-
-		if (strcmp(nextorder, "Initialize") == 0)
-		{
-			char *nextname = NULL;
-			int nextcopies = 0;
-			nextline = readLine(compfileread, tav);
-
-			while (!feof(compfileread))
-			{
-				nextname = split(nextline, 0);////////////////////////check if 0 and 1
-				nextcopies = atoi(split(nextline, 1));
-				nextline = readLine(compfileread, tav);
-				compnodelist=createinlist(nextname, nextcopies, compnodelist);
-			}
-			fclose(compfileread);
-
-			//continue;///////////////break?/////////////////////
-			// do something
-		}
-		else if (strcmp(nextorder, "Finalize") == 0)
-		{
-			printlisttofile(compnodelist, fPtrWrite);
-			free_list(compnodelist);
-			break;
-		}
-		else if (strcmp(nextorder, "Rename") == 0)
-		{
-			char oldname[NAME_LENGTH];
-			strcpy(oldname, split(nextline, 1));
-			char newname[NAME_LENGTH];/////////check this
-			strcpy(newname, split(nextline, 2));
-			rename(oldname, newname);
-			// do something else
-		}
-		else if (strcmp(nextorder, "Returned_from_customer") == 0)
-		{
-			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int copiestoreturn = atoi(split(nextline, 2));
-			returnd_from_cos_func(compnodelist, name, copiestoreturn);
-			// do something else
-		}
-		else if (strcmp(nextorder, "Production") == 0)
-		{
-			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int copiestoreturn = atoi(split(nextline, 2));
-			production_func(compnodelist, name, copiestoreturn);
-			// do something else
-		}
-		else if (strcmp(nextorder, "Fatal_malfunction") == 0)
-		{
-			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int mal_num = atoi(split(nextline, 2));
-			fatal_func(compnodelist, name, mal_num);
-		}
-		else if (strcmp(nextorder, "Fire") == 0)
-		{
-			char name[NAME_LENGTH];
-			strcpy(name, split(nextline, 1));
-			int mal_num = atoi(split(nextline, 2));
-			fire_func(compnodelist, name, mal_num);
-		}
-		/* more else if clauses */
-		else /* default: */
-		{
-			break;
-		}
-
-		//nextline = readLine(orderfileread, fPtrWrite, tav);
-		nextline = readLine(orderfileread, tav);
-		nextorder = split(nextline, 0);
-		if (!feof(orderfileread))
-		{
-			nextorder = "Finalize";
-		}
-		_CrtDumpMemoryLeaks();
-
+	int flag = 0;
+	char *orderfile = argv[2], *compfile = argv[1], *fPtr = argv[3];
+	if (sizeof(argv) != 4) {
+		printf("Error: invalid number of arguments (<%d> instead of 3)\n", sizeof(argv));
+		exit(1);
 	}
-	fclose(orderfileread);
-	fclose(fPtrWrite);
-}
 
+	orderfileread = fopen(orderfile, "r");
+	if (orderfileread == NULL) {  printf("Error: opening %s failed\n", orderfile); exit(1);}
+	compfileread = fopen(compfile, "r");
+	if (compfileread == NULL) {  printf("Error: opening %s failed\n", compfile); exit(1);}
+	fPtrWrite = fopen(fPtr, "w");
+	if (fPtrWrite == NULL) { printf("Error: opening %s failed\n", fPtr);  exit(1);}
+
+		char *nextorder = NULL;
+		char line[LINE_LENGTH], name[NAME_LENGTH];
+		while (fgets(line, LINE_LENGTH, orderfileread) != NULL)
+		{
+			nextorder = split(line, 0);
+			HW_component* last = NULL;
+
+			if (strstr(nextorder, "Initialize") != NULL)
+			{
+
+				int nextcopies = 0;
+				char linecomp[LINE_LENGTH], namecomp[NAME_LENGTH];
+				while (fgets(linecomp, LINE_LENGTH, compfileread) != NULL)
+				{
+
+					strcpy(namecomp, split(linecomp, 0));
+					nextcopies = atoi(split(linecomp, 1));
+					compnodelist = createinlist(namecomp, nextcopies, compnodelist);
+				}
+				last = compnodelist;
+
+			}
+			else if (strstr(nextorder, "Finalize") != NULL)
+			{
+				printlisttofile(compnodelist, fPtrWrite);
+				free_list(compnodelist);
+				break;
+			}
+			else if (strstr(nextorder, "Rename") != NULL)
+			{
+				char oldname[NAME_LENGTH];
+				strcpy(oldname, split(line, 1));
+				char newname[NAME_LENGTH];
+				strcpy(newname, split(line, 2));
+
+				compnodelist = rename_func(compnodelist, oldname, newname);
+
+			}
+			else if (strstr(nextorder, "Returned_from_customer") != NULL)
+			{
+				char name[NAME_LENGTH];
+				strcpy(name, split(line, 1));
+				int copiestoreturn = atoi(split(line, 2));
+				compnodelist = returnd_from_cos_func(compnodelist, name, copiestoreturn);
+
+			}
+			else if (strstr(nextorder, "Production") != NULL)
+			{
+				char name[NAME_LENGTH];
+				strcpy(name, split(line, 1));
+				int copiestoreturn = atoi(split(line, 2));
+				compnodelist = production_func(compnodelist, name, copiestoreturn);
+
+			}
+			else if (strstr(nextorder, "Fatal_malfunction") != NULL)
+			{
+				char name[NAME_LENGTH];
+				strcpy(name, split(line, 1));
+				int mal_num = atoi(split(line, 2));
+				fatal_func(compnodelist, name, mal_num);
+
+			}
+			else if (strstr(nextorder, "Fire") != NULL)
+			{
+				char name[NAME_LENGTH];
+				strcpy(name, split(line, 1));
+				int mal_num = atoi(split(line, 2));
+				fire_func(compnodelist, name, mal_num);
+
+			}
+			/* more else if clauses */
+			else /* default: */
+			{
+				break;
+			}
+
+		}
+		fclose(orderfileread);
+		fclose(fPtrWrite);
+		fclose(compfileread);
+	}
+
+//Input:recives a node of the begining of the list and a name to look for
+//return parameter:returns a HW_component pointer of the location of wanted value or null if not found
+//Function functionality : iterates over the list and comparing the names to the wanted value
 HW_component *find(HW_component *head, char *val)
 {
-	while (head != NULL && strcmp(head->name, val) != 0)
+	while (head != NULL && strcmp(head->name, val) != 0) {
 		head = head->next;
+	}
 	return head;
 }
-
-int rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
+//Input:recives a pointer to a list and two strings, one to change and one to change to.
+//return parameter:returns a HW_component pointer of the list
+//Function functionality : finds the relevant node in the list by name and updates its values
+HW_component *rename_func(HW_component *list, char oldname[NAME_LENGTH], char newname[NAME_LENGTH])
 {
-	HW_component *nodetochange = NULL;
-	nodetochange = find(list, oldname);
-	if (nodetochange != NULL)
+	HW_component *iter = list, *prev = NULL;
+
+	if (list == NULL)
+		return list;
+	iter = list;
+	while(iter !=NULL && strcmp(iter->name, oldname) !=0)
 	{
-		strcpy(nodetochange->name, newname);
+		prev = iter;
+		iter = iter->next;
 	}
-	sort_alpha(list);
-	return 0;
+	if (iter != NULL)
+	{
+		strcpy(iter->name, newname);
+		if (iter == list)
+			list = list->next;
+		else
+			prev->next = iter->next;
+		list = add_and_sort_alpha(list, iter);
+	}
+	return list;
 }
-int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn)
+//Input:recives a pointer to a list and a string of name and an int to update the relevant node with
+//return parameter:returns a HW_component pointer of the list
+//Function functionality : finds the relevant node in the list by name and updates its values
+HW_component *returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copiestoreturn)
 {
 	HW_component *nodetochange = NULL;
 	nodetochange = find(list, name);
@@ -163,16 +182,23 @@ int returnd_from_cos_func(HW_component *list, char name[NAME_LENGTH], int copies
 	}
 	else
 	{
-		createinlist(name, copiestoreturn, list);
+
+		list = createinlist(name, copiestoreturn, list);
 	}
-	sort_alpha(list);
-	return 0;
+
+	return list;
 }
-int production_func(HW_component *list, char name[NAME_LENGTH], int copies)
+//Input::recives a pointer to a list and a string of name and an int to update the relevant node with
+//return parameter:returns a HW_component pointer of the list
+//Function functionality : recives a list and adds a component to it or updates the values of a corresponding existing one
+HW_component *production_func(HW_component *list, char name[NAME_LENGTH], int copies)
 {
-	returnd_from_cos_func(list, name, copies);
-	return 0;
+	list = returnd_from_cos_func(list, name, copies);
+	return list;
 }
+//Input:
+//return parameter:returns an int for success condition
+//Function functionality : 
 int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 {
 	int i;
@@ -183,82 +209,65 @@ int fatal_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 		if (mal_num > nodetochange->copies)
 			nodetochange->copies = 0;
 		else
-			nodetochange->copies = nodetochange->copies - mal_num;
+			nodetochange->copies -= mal_num;
 	}
 }
+//Input:
+//return parameter:returns an int for success condition
+//Function functionality : 
 int fire_func(HW_component *list, char name[NAME_LENGTH], int mal_num)
 {
 	fatal_func(list, name, mal_num);
 }
-
-char *readLine(FILE *fPtrRead, char tav)
-{
-	char *temp = NULL;
-	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	int len = 0;
-	while (tav != '\n' && !feof(fPtrRead) && len < LINE_LENGTH)
-	{
-		fscanf(fPtrRead, "%c", &tav);
-		temp[len] = tav;
-		len++;
-	}
-	//printf(temp);
-	return temp;
-}
-
+//Input:recives a pointer to a list
+//return parameter:returns the size of the list
+//Function functionality : iterates over the list and counts each node, returns the counter value
 int length(const HW_component *head) {
 	int count = 0;
 	HW_component *iter;
 	for (iter = head; iter != NULL; iter = iter->next) { count++; }
 	return count;
 }
+//Input:a pointer to a char array which is the name and int which is the copies number
+//return parameter:HW_component pointer
+//Function functionality : creats a new struct and returns it pointer
+/* Allocate a new comps */
+HW_component* new_cmp(char *name, int copynum)
+{
+	HW_component *std = NULL;
 
+	std = (HW_component*)malloc(sizeof(HW_component));
+	if (std == NULL)
+	{
+		printf("Error: memory allocation failed\n");
+		exit(1);
+	}
+
+	strcpy(std->name, name);
+	std->copies = copynum;
+	std->next = NULL;
+
+	return std;
+}
+//Input:recives a pointer to a list and a file address 
+//return parameter:None
+//Function functionality:iterates over the list and prints it in a specified format to the file
 void printlisttofile(HW_component *list, FILE *fPtrWrite)
 {
-	char *temp = NULL;
-	char *formated = NULL;
-	int size = length(list);
-	if (NULL == (temp = malloc(size * LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	if (NULL == (formated = malloc(LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-	for (HW_component *iter = list; iter != NULL; iter = iter->next)
+	HW_component *iter=list;
+	while (iter != NULL)
 	{
-		sprintf(formated, "%s $$$ %d\n", iter->name, iter->copies);
-		strcat(temp, formated);
+		fprintf(fPtrWrite, "%s $$$ %d\n", iter->name, iter->copies);
+		iter = iter->next;
 	}
-	trimTrailing(temp);
-	free(formated);
-	fprintf(fPtrWrite, "%s", temp);
-	fclose(fPtrWrite);
-	free(temp);
 }
-HW_component* sort_alpha(HW_component *head)
+//Input: two pointers. one for a list and one for a node
+//return parameter:HW_component pointer
+//Function functionality : iterates over the list and compares its string values until it finds the right place, then changes the pointers in the list to add it there
+HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node)
 {
-	HW_component *iter = head, *prev = NULL;
-	if (head == NULL)
-		return NULL;
-	for (HW_component *iter = head; iter != NULL; iter = iter->next)
-	{
-		prev = iter; iter = iter->next;
-		while (iter != NULL)
-		{
-
-			prev->next = iter->next;
-			add_and_sort_alpha(head, iter);
-			prev = iter;
-			iter = iter->next;
-		}
-		return head;
-	}
-
-}
-HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 	HW_component* iter, *prev = NULL;
-	//HW_component* new_node = create_node(data);
-
-	/* incomplete, must check for failure */
+	 
 	if (head == NULL)
 		return new_node;
 
@@ -268,7 +277,7 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 	}
 
 	iter = head;
-	while (iter != NULL && strcmp(new_node->name, iter->name) >= 0) {
+	while (iter != NULL && iter->name != NULL && strcmp(new_node->name, iter->name) >= 0) {
 		prev = iter;
 		iter = iter->next;
 	}
@@ -278,179 +287,58 @@ HW_component* add_and_sort_alpha(HW_component *head, HW_component *new_node) {
 
 	return head;
 }
-
-HW_component *delete(HW_component *head, char *val)
-{
-	HW_component *iter = head, *prev = NULL;
-
-	if (head == NULL)
-		return head;
-
-	if (head->name == val)
-	{
-		iter = head->next;
-		free(head);
-		return iter;
-	}
-	prev = iter; iter = iter->next;
-	while (iter != NULL)
-	{
-		if (iter->name == val)
-		{
-			prev->next = iter->next;
-			free(iter);
-			break;
-		}
-		prev = iter;
-		iter = iter->next;
-	}
-	return head;
-}
-
-
-
+//Input:pointer to a list of HW_component
+//return parameter: None
+//Function functionality : iterates over the list and frees its pointer's allocations
 /* Free a list of comps */
 void free_list(HW_component *head)
 {
 	HW_component *temp = NULL;
 
-		while (head != NULL)
-		{
-			temp = head;
-			head = head->next;
-			free(temp);
-		}
-}
-
-/* Allocate a new comps */
-HW_component* new_cmp(char *name, int copynum)
-{
-	HW_component *std = NULL;
-
-	std = (HW_component*)malloc(sizeof(HW_component));
-	if (std == NULL)
+	while (head != NULL)
 	{
-		printf("Memory allocation error!\n");
-		return NULL;
-	}
-
-	strcpy(std->name, name);
-	std->copies = copynum;
-	std->next = NULL;
-
-	return std;
-}
-HW_component *add_cmp(HW_component *head, HW_component *cmp)
-{
-	HW_component *tail;
-	if (cmp == NULL)
-		return NULL;
-
-	if (head == NULL)
-	{
-		head = cmp;
-		return head;
+		temp = head;
+		head = head->next;
+		free(temp);
 	}
 
 
-	tail = head;
-	while (tail->next != NULL)
-		tail = tail->next;
-	tail->next = cmp;
-
-	return head;
 }
-
+//Input:recives a pointer to a list and a file address 
+//return parameter:returns a pointer to the top of the list with the added node to it
+//Function functionality : creates a new node by another function and changes the pointers of the list to add the new one in a sorted way
 HW_component *createinlist(char *name, int copynum, HW_component *newlist)
 {
-	HW_component *toreturn = add_cmp(newlist, new_cmp(name, copynum));
+
+	HW_component *toreturn = add_and_sort_alpha(newlist, new_cmp(name,copynum));
 	return toreturn;
 }
-
+//Input:pointer to a char array and int for seperated value which to return
+//return parameter: returns a char pointer to a wanted place in a string
+//Function functionality : iterates over a string and seperates it by a relevant delimiter and returns the wanted iteration
 char *split(char *buf, int iter)
 {
-	int i = 0;
-	int dollar = 0;
-	if (strchr(buf, '$')) { dollar = 1; }
-
-	char *temp = NULL;
-	if (NULL == (temp = malloc(LINE_LENGTH * sizeof(char) + 1)))
-		exit(1);
-
-	strcpy(temp, buf);
-
-	char *p = strtok(temp, "$$$");
-
-	if (dollar) {
-		while (p != NULL && *p != '\n' && i < iter)
+	int i, partlen;
+	char *endbit, res[NAME_LENGTH];
+	for (i = 0; i < iter; i++)
+	{
+		buf = strstr(buf, " $$$ ");
+		if (buf == NULL)
 		{
-			//array[i++] = p;
-			p = strtok(NULL, "$$$");
-			i++;
+			return NULL;
 		}
-		if (p != NULL)
-		{
-
-			trimLeading(p);
-			trimTrailing(p);
-		}
+		buf += strlen(" $$$ ");
 	}
-
+	endbit = strstr(buf, " $$$ ");
+	if (endbit != NULL)
+		partlen = strlen(buf) - strlen(endbit);
 	else
-		p = strtok(p, "\n");
+		partlen = strlen(buf);
 
-	//strcpy(buf, temp);
-	//free(temp);
-	return p;
+	strncpy(res, buf, partlen);
+	if (res[partlen - 1] == '\n')
+		partlen--;
+	res[partlen] = '\0';
+
+	return res;
 }
-/**
- * Remove trailing white space characters from string
- */
-void trimTrailing(char * str)
-{
-	int index, i;
-
-	/* Set default index */
-	index = -1;
-
-	/* Find last index of non-white space character */
-	i = 0;
-	while (str[i] != '\0')
-	{
-		if (str[i] != ' ' && str[i] != '\t' && str[i] != '\n')
-		{
-			index = i;
-		}
-
-		i++;
-	}
-
-	/* Mark next character to last non-white space character as NULL */
-	str[index + 1] = '\0';
-}
-void trimLeading(char * str)
-{
-	int index, i, j;
-
-	index = 0;
-
-	/* Find last index of whitespace character */
-	while (str[index] == ' ' || str[index] == '\t' || str[index] == '\n' || str[index] == NULL)
-	{
-		index++;
-	}
-
-
-	if (index != 0)
-	{
-		/* Shit all trailing characters to its left */
-		i = 0;
-		while (str[i + index] != '\0')
-		{
-			str[i] = str[i + index];
-			i++;
-		}
-		str[i] = '\0'; // Make sure that string is NULL terminated
-	}
-}
-
