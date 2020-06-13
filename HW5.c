@@ -257,8 +257,10 @@ void printlisttofile(HW_component *list, FILE *fPtrWrite)
 	HW_component *iter=list;
 	while (iter != NULL)
 	{
-		fprintf(fPtrWrite, "%s $$$ %d\n", iter->name, iter->copies);
+		fprintf(fPtrWrite, "%s $$$ %d", iter->name, iter->copies);
 		iter = iter->next;
+		if (iter != NULL)
+			fprintf(fPtrWrite,"\n");
 	}
 }
 //Input: two pointers. one for a list and one for a node
